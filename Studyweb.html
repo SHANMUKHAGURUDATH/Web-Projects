@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PDFVault — Free Knowledge Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a28;
+    --border: rgba(255,255,255,0.07);
+    --accent: #f0b429;
+    --accent2: #e05b5b;
+    --accent3: #5be0b3;
+    --text: #e8e6f0;
+    --muted: #7a7890;
+    --card: #141420;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Lora',serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  /* Background grain */
+  body::before{
+    content:'';
+    position:fixed;inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events:none;z-index:0;opacity:.4;
+  }
+
+  /* NAV */
+  nav{
+    position:sticky;top:0;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 2.5rem;height:64px;
+    background:rgba(10,10,15,0.85);
+    backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);
+  }
+  .logo{
+    font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;
+    letter-spacing:-0.03em;
+    background:linear-gradient(135deg,var(--accent),#ff8c42);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .logo span{color:var(--text);-webkit-text-fill-color:var(--muted);font-weight:400;font-size:0.85rem;margin-left:8px;vertical-align:middle;}
+  .nav-actions{display:flex;gap:12px;align-items:center;}
+  .btn{
+    font-family:'Syne',sans-serif;font-size:0.8rem;font-weight:600;letter-spacing:0.05em;
+    padding:8px 18px;border-radius:6px;cursor:pointer;transition:all .2s;border:none;
+  }
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+  .btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.2);}
+  .btn-accent{background:var(--accent);color:#0a0a0f;}
+  .btn-accent:hover{background:#f5c842;transform:translateY(-1px);box-shadow:0 4px 20px rgba(240,180,41,0.3);}
+
+  /* HERO */
+  .hero{
+    position:relative;
+    padding:5rem 2.5rem 3rem;
+    text-align:center;
+    overflow:hidden;
+  }
+  .hero-glow{
+    position:absolute;top:-80px;left:50%;transform:translateX(-50%);
+    width:600px;height:400px;
+    background:radial-gradient(ellipse,rgba(240,180,41,0.12) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  .hero h1{
+    font-family:'Syne',sans-serif;font-size:clamp(2.5rem,6vw,5rem);
+    font-weight:800;letter-spacing:-0.04em;line-height:1;
+    margin-bottom:1.2rem;
+  }
+  .hero h1 em{
+    font-style:normal;
+    background:linear-gradient(135deg,var(--accent),#ff6b35);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .hero p{
+    font-size:1.1rem;color:var(--muted);max-width:560px;margin:0 auto 2.5rem;line-height:1.7;
+    font-style:italic;
+  }
+
+  /* SEARCH BAR */
+  .search-wrap{
+    max-width:680px;margin:0 auto 1rem;
+    position:relative;
+  }
+  .search-input{
+    width:100%;padding:1rem 1rem 1rem 3.2rem;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    color:var(--text);font-family:'Lora',serif;font-size:1rem;
+    outline:none;transition:border-color .2s,box-shadow .2s;
+  }
+  .search-input:focus{
+    border-color:rgba(240,180,41,0.4);
+    box-shadow:0 0 0 3px rgba(240,180,41,0.08);
+  }
+  .search-icon{
+    position:absolute;left:1rem;top:50%;transform:translateY(-50%);
+    color:var(--muted);pointer-events:none;font-size:1.1rem;
+  }
+  .search-input::placeholder{color:var(--muted);}
+
+  /* STATS */
+  .stats{
+    display:flex;justify-content:center;gap:3rem;
+    padding:1.5rem 2.5rem;
+    border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+    background:var(--surface);
+    margin-bottom:0;
+  }
+  .stat{text-align:center;}
+  .stat-num{
+    font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;
+    color:var(--accent);display:block;
+  }
+  .stat-label{font-size:0.75rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;font-family:'DM Mono',monospace;}
+
+  /* MAIN LAYOUT */
+  .main{display:flex;gap:0;min-height:calc(100vh - 200px);}
+  
+  /* SIDEBAR */
+  .sidebar{
+    width:260px;min-width:260px;
+    border-right:1px solid var(--border);
+    padding:1.5rem;
+    background:var(--surface);
+    position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;
+  }
+  .sidebar::-webkit-scrollbar{width:4px;}
+  .sidebar::-webkit-scrollbar-track{background:transparent;}
+  .sidebar::-webkit-scrollbar-thumb{background:var(--border);}
+  .sidebar-title{
+    font-family:'Syne',sans-serif;font-size:0.7rem;letter-spacing:0.12em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:1rem;
+  }
+  .topic-btn{
+    display:flex;align-items:center;justify-content:space-between;
+    width:100%;padding:9px 12px;border-radius:8px;
+    background:transparent;border:none;cursor:pointer;
+    color:var(--muted);font-family:'Syne',sans-serif;font-size:0.82rem;font-weight:600;
+    transition:all .15s;margin-bottom:3px;text-align:left;
+  }
+  .topic-btn:hover{background:var(--surface2);color:var(--text);}
+  .topic-btn.active{background:rgba(240,180,41,0.12);color:var(--accent);}
+  .topic-btn .count{
+    font-family:'DM Mono',monospace;font-size:0.7rem;
+    background:var(--surface2);padding:2px 7px;border-radius:20px;
+  }
+  .topic-btn.active .count{background:rgba(240,180,41,0.2);color:var(--accent);}
+  .topic-icon{margin-right:8px;font-size:0.9rem;}
+
+  /* CONTENT AREA */
+  .content{flex:1;padding:1.5rem 2rem;overflow-y:auto;}
+  
+  /* TOOLBAR */
+  .toolbar{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:1.5rem;
+  }
+  .toolbar-left{font-family:'Syne',sans-serif;font-size:0.85rem;color:var(--muted);}
+  .toolbar-left strong{color:var(--text);}
+  .sort-select{
+    background:var(--surface);border:1px solid var(--border);
+    color:var(--text);font-family:'Syne',sans-serif;font-size:0.8rem;
+    padding:6px 12px;border-radius:6px;cursor:pointer;outline:none;
+  }
+
+  /* PDF GRID */
+  .pdf-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:1.2rem;
+  }
+  .pdf-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:1.2rem;
+    cursor:pointer;
+    transition:all .2s;
+    position:relative;overflow:hidden;
+  }
+  .pdf-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--accent),transparent);
+    opacity:0;transition:opacity .2s;
+  }
+  .pdf-card:hover{
+    border-color:rgba(240,180,41,0.25);
+    transform:translateY(-2px);
+    box-shadow:0 8px 30px rgba(0,0,0,0.3);
+  }
+  .pdf-card:hover::before{opacity:1;}
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.9rem;}
+  .card-icon{
+    width:44px;height:56px;
+    background:linear-gradient(135deg,rgba(240,180,41,0.15),rgba(240,180,41,0.05));
+    border:1px solid rgba(240,180,41,0.2);
+    border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.3rem;flex-shrink:0;
+  }
+  .card-meta{text-align:right;}
+  .rating-badge{
+    display:inline-flex;align-items:center;gap:4px;
+    font-family:'DM Mono',monospace;font-size:0.75rem;
+    padding:3px 8px;border-radius:20px;font-weight:500;
+  }
+  .rating-high{background:rgba(91,224,179,0.15);color:var(--accent3);}
+  .rating-med{background:rgba(240,180,41,0.15);color:var(--accent);}
+  .rating-low{background:rgba(224,91,91,0.15);color:var(--accent2);}
+  .card-pages{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);margin-top:4px;}
+  .card-title{
+    font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;
+    line-height:1.3;margin-bottom:.5rem;color:var(--text);
+  }
+  .card-summary{font-size:0.8rem;color:var(--muted);line-height:1.6;margin-bottom:.9rem;}
+  .card-footer{display:flex;align-items:center;justify-content:space-between;}
+  .card-topic{
+    font-family:'Syne',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.06em;
+    padding:3px 10px;border-radius:20px;
+    background:var(--surface2);color:var(--muted);
+  }
+  .card-downloads{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);}
+  .open-btn{
+    display:flex;align-items:center;gap:6px;
+    margin-top:.8rem;padding:7px 14px;border-radius:6px;
+    background:transparent;border:1px solid var(--border);
+    color:var(--text);font-family:'Syne',sans-serif;font-size:0.75rem;font-weight:600;
+    cursor:pointer;transition:all .15s;width:100%;justify-content:center;
+  }
+  .open-btn:hover{background:rgba(240,180,41,0.1);border-color:rgba(240,180,41,0.3);color:var(--accent);}
+
+  /* UPLOAD MODAL */
+  .modal-overlay{
+    display:none;position:fixed;inset:0;
+    background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);
+    z-index:200;align-items:center;justify-content:center;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    width:min(600px,95vw);
+    max-height:90vh;overflow-y:auto;
+    padding:2rem;
+    animation:modalIn .25s ease;
+  }
+  @keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
+  .modal-header{
+    display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;
+  }
+  .modal-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;}
+  .close-btn{
+    background:var(--surface2);border:none;color:var(--muted);
+    width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1rem;
+    transition:all .15s;
+  }
+  .close-btn:hover{color:var(--text);background:rgba(255,255,255,0.1);}
+  .drop-zone{
+    border:2px dashed rgba(240,180,41,0.3);
+    border-radius:12px;
+    padding:2.5rem;text-align:center;
+    cursor:pointer;transition:all .2s;margin-bottom:1.5rem;
+    background:rgba(240,180,41,0.03);
+  }
+  .drop-zone:hover,.drop-zone.dragover{
+    border-color:rgba(240,180,41,0.6);
+    background:rgba(240,180,41,0.06);
+  }
+  .drop-icon{font-size:2.5rem;margin-bottom:.8rem;}
+  .drop-text{font-family:'Syne',sans-serif;font-size:0.9rem;color:var(--muted);}
+  .drop-text strong{color:var(--accent);}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+  .form-group{margin-bottom:1rem;}
+  .form-label{
+    display:block;font-family:'Syne',sans-serif;font-size:0.78rem;font-weight:600;
+    letter-spacing:0.06em;color:var(--muted);margin-bottom:.4rem;
+    text-transform:uppercase;
+  }
+  .form-input,.form-select,.form-textarea{
+    width:100%;padding:.7rem 1rem;
+    background:var(--surface2);border:1px solid var(--border);
+    border-radius:8px;color:var(--text);
+    font-family:'Lora',serif;font-size:.9rem;
+    outline:none;transition:border-color .15s;
+  }
+  .form-input:focus,.form-select:focus,.form-textarea:focus{
+    border-color:rgba(240,180,41,0.4);
+  }
+  .form-textarea{resize:vertical;min-height:80px;}
+  .form-select option{background:var(--surface2);}
+  
+  /* AI ANALYSIS PANEL */
+  .ai-panel{
+    background:rgba(91,224,179,0.05);
+    border:1px solid rgba(91,224,179,0.15);
+    border-radius:12px;padding:1.2rem;margin-top:1rem;
+    display:none;
+  }
+  .ai-panel.visible{display:block;animation:fadeIn .4s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .ai-panel-header{
+    display:flex;align-items:center;gap:.6rem;
+    font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;
+    color:var(--accent3);margin-bottom:.8rem;
+  }
+  .ai-dot{
+    width:8px;height:8px;border-radius:50%;background:var(--accent3);
+    animation:pulse 1.5s infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .ai-result{font-size:.85rem;color:var(--muted);line-height:1.7;}
+  .ai-result strong{color:var(--text);}
+  .ai-score{
+    display:flex;align-items:center;gap:1rem;margin-top:.8rem;
+    padding:.8rem;background:var(--surface);border-radius:8px;
+  }
+  .score-circle{
+    width:52px;height:52px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;
+    flex-shrink:0;
+  }
+  .score-high{background:rgba(91,224,179,0.15);color:var(--accent3);border:2px solid rgba(91,224,179,0.3);}
+  .score-med{background:rgba(240,180,41,0.15);color:var(--accent);border:2px solid rgba(240,180,41,0.3);}
+  .score-low{background:rgba(224,91,91,0.15);color:var(--accent2);border:2px solid rgba(224,91,91,0.3);}
+  .score-info{flex:1;}
+  .score-label{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;margin-bottom:3px;}
+  .score-verdict{font-size:.78rem;color:var(--muted);}
+  .progress-bar{
+    height:4px;background:var(--surface2);border-radius:2px;margin-top:.8rem;overflow:hidden;
+  }
+  .progress-fill{height:100%;border-radius:2px;transition:width 1s ease;background:linear-gradient(90deg,var(--accent3),var(--accent));}
+
+  /* PDF VIEWER MODAL */
+  .viewer-modal{
+    display:none;position:fixed;inset:0;
+    background:rgba(0,0,0,0.9);
+    z-index:300;flex-direction:column;
+  }
+  .viewer-modal.open{display:flex;}
+  .viewer-nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:.8rem 1.5rem;
+    background:var(--surface);border-bottom:1px solid var(--border);
+    flex-shrink:0;
+  }
+  .viewer-title{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;}
+  .viewer-body{flex:1;display:flex;overflow:hidden;}
+  .pdf-preview{
+    flex:1;background:var(--bg);display:flex;align-items:center;justify-content:center;
+    flex-direction:column;gap:1rem;padding:2rem;
+    overflow-y:auto;
+  }
+  .pdf-page-sim{
+    width:min(700px,90%);
+    background:#fff;color:#222;
+    border-radius:4px;padding:3rem 3.5rem;
+    box-shadow:0 4px 40px rgba(0,0,0,0.5);
+    font-family:'Lora',serif;
+    min-height:500px;
+    line-height:1.8;
+    font-size:.95rem;
+  }
+  .pdf-page-sim h2{font-size:1.4rem;margin-bottom:1rem;font-family:'Syne',sans-serif;}
+  .pdf-page-sim h3{font-size:1.1rem;margin:1.5rem 0 .5rem;font-family:'Syne',sans-serif;}
+  .pdf-page-sim p{margin-bottom:1rem;}
+  .viewer-info{
+    width:300px;background:var(--surface);border-left:1px solid var(--border);
+    padding:1.5rem;overflow-y:auto;flex-shrink:0;
+  }
+  .info-section{margin-bottom:1.5rem;}
+  .info-label{font-family:'Syne',sans-serif;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
+  .info-value{font-size:.9rem;line-height:1.6;}
+
+  /* TOAST */
+  .toast{
+    position:fixed;bottom:2rem;right:2rem;
+    padding:.8rem 1.2rem;border-radius:10px;
+    font-family:'Syne',sans-serif;font-size:.85rem;font-weight:600;
+    z-index:500;
+    transform:translateY(100px);opacity:0;
+    transition:all .3s ease;
+    display:flex;align-items:center;gap:.5rem;
+  }
+  .toast.show{transform:translateY(0);opacity:1;}
+  .toast-success{background:#1a2e23;border:1px solid rgba(91,224,179,.3);color:var(--accent3);}
+  .toast-error{background:#2e1a1a;border:1px solid rgba(224,91,91,.3);color:var(--accent2);}
+
+  /* LOADING */
+  .loading-spinner{
+    display:inline-block;width:16px;height:16px;
+    border:2px solid rgba(255,255,255,.2);
+    border-top-color:var(--accent);border-radius:50%;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* EMPTY STATE */
+  .empty-state{
+    text-align:center;padding:4rem;color:var(--muted);
+  }
+  .empty-state .empty-icon{font-size:3rem;margin-bottom:1rem;opacity:.4;}
+  .empty-state p{font-size:.9rem;line-height:1.6;}
+
+  /* ═══ BOTTOM SECTIONS ═══ */
+
+  /* VISUAL SECTION */
+  .viz-section{
+    padding:4rem 2.5rem;
+    border-top:1px solid var(--border);
+    background:linear-gradient(180deg,var(--bg),var(--surface));
+  }
+  .viz-header{text-align:center;margin-bottom:2.5rem;}
+  .viz-tag{
+    display:inline-block;font-family:'Syne',sans-serif;font-size:.72rem;
+    font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    padding:4px 12px;border-radius:20px;margin-bottom:.8rem;
+    background:rgba(240,180,41,0.1);color:var(--accent);border:1px solid rgba(240,180,41,0.2);
+  }
+  .viz-title{
+    font-family:'Syne',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);
+    font-weight:800;letter-spacing:-0.03em;margin-bottom:.6rem;
+  }
+  .viz-title em{font-style:normal;background:linear-gradient(135deg,var(--accent),#ff6b35);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .viz-sub{color:var(--muted);font-size:.95rem;max-width:500px;margin:0 auto .8rem;line-height:1.6;font-style:italic;}
+  .btn-viz-toggle{
+    background:var(--surface2);border:1px solid var(--border);
+    color:var(--text);font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;
+    padding:10px 24px;border-radius:8px;cursor:pointer;transition:all .2s;
+    margin-top:.5rem;
+  }
+  .btn-viz-toggle:hover{background:rgba(240,180,41,0.1);border-color:rgba(240,180,41,0.3);color:var(--accent);}
+  .viz-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;
+    max-width:900px;margin:0 auto;
+    animation:fadeIn .4s ease;
+  }
+  .viz-card{
+    background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.4rem;
+  }
+  .viz-card-wide{grid-column:span 2;}
+  .viz-card-title{
+    font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;
+    color:var(--muted);margin-bottom:1.2rem;text-transform:uppercase;letter-spacing:.06em;
+  }
+
+  /* Bar Chart */
+  .bar-chart{display:flex;flex-direction:column;gap:8px;}
+  .bar-row{display:flex;align-items:center;gap:.6rem;}
+  .bar-label{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);width:100px;text-align:right;flex-shrink:0;}
+  .bar-track{flex:1;height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent),#ff6b35);transition:width 1s ease;}
+  .bar-count{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);width:20px;flex-shrink:0;}
+
+  /* Donut Chart */
+  .donut-wrap{display:flex;align-items:center;gap:1.5rem;justify-content:center;}
+  .donut-legend{display:flex;flex-direction:column;gap:6px;}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);font-family:'DM Mono',monospace;}
+  .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+  /* Spark List */
+  .spark-list{display:flex;flex-direction:column;gap:.6rem;}
+  .spark-row{display:flex;align-items:center;gap:1rem;}
+  .spark-rank{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--surface2);width:28px;text-align:center;flex-shrink:0;}
+  .spark-rank.r1{color:var(--accent);}
+  .spark-rank.r2{color:var(--muted);}
+  .spark-rank.r3{color:#cd7f32;}
+  .spark-info{flex:1;}
+  .spark-title{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:600;}
+  .spark-track{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:4px;}
+  .spark-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent3),var(--accent));transition:width 1s .2s ease;}
+  .spark-num{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);flex-shrink:0;}
+
+  /* AI TOOLS */
+  .ai-tools-section{
+    padding:4rem 2.5rem;
+    background:var(--surface);
+    border-top:1px solid var(--border);
+  }
+  .ai-tools-header{text-align:center;margin-bottom:2rem;}
+  .ai-tools-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    gap:1rem;max-width:900px;margin:0 auto;
+  }
+  .ai-tool-card{
+    display:flex;align-items:center;gap:1rem;
+    padding:1rem 1.2rem;border-radius:12px;
+    text-decoration:none;
+    border:1px solid var(--border);
+    transition:all .2s;
+    position:relative;overflow:hidden;
+  }
+  .ai-tool-card::after{
+    content:'';position:absolute;inset:0;opacity:0;transition:opacity .2s;
+  }
+  .ai-tool-card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,0.3);}
+  .ai-gemini{background:linear-gradient(135deg,rgba(66,133,244,0.08),rgba(52,168,83,0.08));}
+  .ai-gemini:hover{border-color:rgba(66,133,244,0.4);}
+  .ai-notebooklm{background:linear-gradient(135deg,rgba(234,67,53,0.08),rgba(251,188,5,0.08));}
+  .ai-notebooklm:hover{border-color:rgba(234,67,53,0.4);}
+  .ai-claude{background:linear-gradient(135deg,rgba(224,119,67,0.08),rgba(240,180,41,0.08));}
+  .ai-claude:hover{border-color:rgba(240,180,41,0.4);}
+  .ai-gpt{background:linear-gradient(135deg,rgba(16,163,127,0.08),rgba(91,224,179,0.08));}
+  .ai-gpt:hover{border-color:rgba(16,163,127,0.4);}
+  .ai-tool-logo{
+    font-size:1.6rem;width:44px;height:44px;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--surface2);border-radius:10px;flex-shrink:0;
+  }
+  .ai-tool-name{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;color:var(--text);}
+  .ai-tool-desc{font-size:.75rem;color:var(--muted);margin-top:2px;}
+  .ai-tool-arrow{color:var(--muted);font-size:1.1rem;margin-left:auto;transition:transform .2s;}
+  .ai-tool-card:hover .ai-tool-arrow{transform:translateX(4px);color:var(--accent);}
+
+  /* LINKS SECTION */
+  .links-section{
+    padding:4rem 2.5rem;
+    background:var(--bg);
+    border-top:1px solid var(--border);
+  }
+  .links-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    gap:1.2rem;max-width:960px;margin:0 auto 3rem;
+  }
+  .link-card{
+    background:var(--card);border:1px solid var(--border);border-radius:12px;
+    padding:1.2rem;transition:all .2s;
+  }
+  .link-card:hover{border-color:rgba(91,224,179,0.25);transform:translateY(-2px);}
+  .link-card-top{display:flex;align-items:center;gap:.8rem;margin-bottom:.7rem;}
+  .link-icon{font-size:1.6rem;width:42px;height:42px;background:var(--surface2);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .link-name{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;}
+  .link-url{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin-top:2px;}
+  .link-desc{font-size:.8rem;color:var(--muted);line-height:1.6;margin-bottom:.9rem;}
+  .link-btn{
+    display:inline-block;padding:7px 16px;
+    background:var(--surface2);border:1px solid var(--border);
+    color:var(--text);font-family:'Syne',sans-serif;font-size:.78rem;font-weight:600;
+    border-radius:6px;text-decoration:none;cursor:pointer;transition:all .15s;
+  }
+  .link-btn:hover{background:rgba(91,224,179,0.1);border-color:rgba(91,224,179,0.3);color:var(--accent3);}
+
+  /* EMBED SECTION */
+  .embed-section{
+    max-width:900px;margin:0 auto;
+    background:var(--card);border:1px solid rgba(66,133,244,0.2);
+    border-radius:16px;padding:2rem;text-align:center;
+  }
+  .embed-header{margin-bottom:1rem;}
+  .embed-container{
+    border-radius:12px;overflow:hidden;
+    border:1px solid var(--border);
+    min-height:200px;
+    background:var(--surface2);
+  }
+  .embed-placeholder{
+    padding:3rem;cursor:pointer;transition:background .2s;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height:200px;
+  }
+  .embed-placeholder:hover{background:rgba(66,133,244,0.05);}
+  .embed-launch-btn{
+    margin-top:1rem;padding:10px 24px;
+    background:linear-gradient(135deg,#4285f4,#34a853);
+    color:#fff;font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;
+    border-radius:8px;border:none;cursor:pointer;
+  }
+  iframe.notebooklm-frame{
+    width:100%;height:600px;border:none;display:block;
+  }
+
+  /* FOOTER */
+  .site-footer{
+    padding:2.5rem;
+    background:var(--surface);
+    border-top:1px solid var(--border);
+    text-align:center;
+  }
+  .footer-inner{display:flex;flex-direction:column;align-items:center;gap:.3rem;}
+  .footer-link{
+    color:var(--muted);font-family:'DM Mono',monospace;font-size:.75rem;
+    text-decoration:none;transition:color .15s;
+  }
+  .footer-link:hover{color:var(--accent3);}
+
+  /* RESPONSIVE */
+  @media(max-width:768px){
+    .sidebar{display:none;}
+    .stats{gap:1.5rem;}
+    .form-row{grid-template-columns:1fr;}
+    .viewer-info{display:none;}
+    nav{padding:0 1rem;}
+    .hero{padding:3rem 1rem 2rem;}
+    .viz-grid{grid-template-columns:1fr;}
+    .viz-card-wide{grid-column:span 1;}
+    .donut-wrap{flex-direction:column;}
+    .ai-tools-section,.links-section,.viz-section{padding:2.5rem 1rem;}
+    .embed-section{padding:1.2rem;}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">PDFVault <span>Free Knowledge Library</span></div>
+  <div class="nav-actions">
+    <button class="btn btn-ghost" onclick="showStats()">📊 Stats</button>
+    <button class="btn btn-accent" onclick="openUpload()">+ Upload PDF</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <h1>Search <em>Free PDFs.</em><br>Learn Anything.</h1>
+  <p>A community-powered library of academic papers, books, and resources — all free, no login required. AI-curated for quality.</p>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" type="text" placeholder="Search by title, author, topic, keyword…" id="searchInput" oninput="handleSearch()"/>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><span class="stat-num" id="totalCount">0</span><span class="stat-label">PDFs Available</span></div>
+  <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Free Access</span></div>
+  <div class="stat"><span class="stat-num" id="topicCount">0</span><span class="stat-label">Topics Covered</span></div>
+  <div class="stat"><span class="stat-num">AI</span><span class="stat-label">Quality Rated</span></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-title">Browse by Topic</div>
+    <div id="topicList"></div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <div class="toolbar">
+      <div class="toolbar-left">Showing <strong id="resultCount">0</strong> PDFs</div>
+      <select class="sort-select" onchange="handleSort(this.value)">
+        <option value="rating">Sort: Highest Rated</option>
+        <option value="newest">Sort: Newest</option>
+        <option value="downloads">Sort: Most Downloaded</option>
+        <option value="pages">Sort: Fewest Pages</option>
+      </select>
+    </div>
+    <div class="pdf-grid" id="pdfGrid"></div>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="empty-icon">📭</div>
+      <p>No PDFs match your search.<br>Try a different keyword or topic.</p>
+    </div>
+  </main>
+</div>
+
+<!-- UPLOAD MODAL -->
+<div class="modal-overlay" id="uploadModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📤 Upload a PDF</div>
+      <button class="close-btn" onclick="closeUpload()">✕</button>
+    </div>
+    
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <div class="drop-icon">📄</div>
+      <div class="drop-text"><strong>Click to choose</strong> or drag & drop your PDF here</div>
+      <div class="drop-text" style="font-size:.75rem;margin-top:.3rem;">Max 50MB · PDF only</div>
+      <input type="file" id="fileInput" accept=".pdf" style="display:none" onchange="handleFile(this)"/>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Title *</label>
+        <input class="form-input" id="uploadTitle" placeholder="Document title"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Author</label>
+        <input class="form-input" id="uploadAuthor" placeholder="Author name(s)"/>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Topic *</label>
+        <select class="form-select" id="uploadTopic">
+          <option value="">Select topic…</option>
+          <option>Mathematics</option>
+          <option>Physics</option>
+          <option>Computer Science</option>
+          <option>Biology</option>
+          <option>Chemistry</option>
+          <option>History</option>
+          <option>Philosophy</option>
+          <option>Economics</option>
+          <option>Psychology</option>
+          <option>Engineering</option>
+          <option>Literature</option>
+          <option>Medicine</option>
+          <option>Law</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Year Published</label>
+        <input class="form-input" id="uploadYear" type="number" placeholder="e.g. 2023" min="1900" max="2025"/>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Brief Description</label>
+      <textarea class="form-textarea" id="uploadDesc" placeholder="What is this document about?"></textarea>
+    </div>
+
+    <button class="btn btn-accent" style="width:100%;padding:12px;font-size:.9rem;" id="analyzeBtn" onclick="runAIAnalysis()">
+      🤖 Analyze with AI & Submit
+    </button>
+
+    <!-- AI ANALYSIS PANEL -->
+    <div class="ai-panel" id="aiPanel">
+      <div class="ai-panel-header">
+        <div class="ai-dot"></div>
+        <span>AI Quality Analysis</span>
+      </div>
+      <div class="ai-result" id="aiResult"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PDF VIEWER MODAL -->
+<div class="viewer-modal" id="viewerModal">
+  <div class="viewer-nav">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <button class="btn btn-ghost" onclick="closeViewer()" style="padding:6px 12px;">← Back</button>
+      <div class="viewer-title" id="viewerTitle">Document Title</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-ghost" onclick="downloadPdf()" style="padding:6px 12px;">⬇ Download</button>
+      <div class="rating-badge rating-high" id="viewerRating">⭐ 9.2</div>
+    </div>
+  </div>
+  <div class="viewer-body">
+    <div class="pdf-preview" id="pdfPreview"></div>
+    <div class="viewer-info">
+      <div class="info-section">
+        <div class="info-label">About This Document</div>
+        <div class="info-value" id="viewerDesc"></div>
+      </div>
+      <div class="info-section">
+        <div class="info-label">Topic</div>
+        <div class="info-value" id="viewerTopic"></div>
+      </div>
+      <div class="info-section">
+        <div class="info-label">Author</div>
+        <div class="info-value" id="viewerAuthor"></div>
+      </div>
+      <div class="info-section">
+        <div class="info-label">AI Analysis</div>
+        <div class="info-value" id="viewerAnalysis"></div>
+      </div>
+      <div class="info-section">
+        <div class="info-label">Quality Score</div>
+        <div id="viewerScore"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══ BOTTOM SECTIONS ═══ -->
+
+<!-- VISUAL REPRESENTATION SECTION -->
+<section class="viz-section" id="vizSection">
+  <div class="viz-header">
+    <div class="viz-tag">📊 Library Analytics</div>
+    <h2 class="viz-title">Want to try <em>Visual Representation?</em></h2>
+    <p class="viz-sub">Explore the library through charts, topic breakdowns, and rating distributions.</p>
+    <button class="btn-viz-toggle" id="vizToggleBtn" onclick="toggleViz()">
+      <span>▶ Show Visualizations</span>
+    </button>
+  </div>
+
+  <div class="viz-grid" id="vizGrid" style="display:none;">
+    <!-- Bar Chart: PDFs per Topic -->
+    <div class="viz-card">
+      <div class="viz-card-title">📚 PDFs by Topic</div>
+      <div class="bar-chart" id="barChart"></div>
+    </div>
+
+    <!-- Rating Distribution -->
+    <div class="viz-card">
+      <div class="viz-card-title">⭐ Rating Distribution</div>
+      <div class="donut-wrap">
+        <canvas id="donutChart" width="200" height="200"></canvas>
+        <div class="donut-legend" id="donutLegend"></div>
+      </div>
+    </div>
+
+    <!-- Downloads Sparkline -->
+    <div class="viz-card viz-card-wide">
+      <div class="viz-card-title">⬇ Top 5 Most Downloaded</div>
+      <div class="spark-list" id="sparkList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- AI TOOLS BANNER -->
+<section class="ai-tools-section">
+  <div class="ai-tools-header">
+    <div class="viz-tag" style="background:rgba(138,43,226,0.15);color:#bf7fff;border-color:rgba(138,43,226,0.25);">🤖 AI-Powered Reading</div>
+    <h2 class="viz-title">Supercharge your reading with <em style="background:linear-gradient(135deg,#bf7fff,#5be0b3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">AI Tools</em></h2>
+    <p class="viz-sub">Open any PDF directly in these AI assistants for instant summaries, Q&A, and deep analysis.</p>
+  </div>
+  <div class="ai-tools-grid">
+    <a href="https://gemini.google.com" target="_blank" class="ai-tool-card ai-gemini">
+      <div class="ai-tool-logo">✦</div>
+      <div class="ai-tool-info">
+        <div class="ai-tool-name">Google Gemini</div>
+        <div class="ai-tool-desc">Upload a PDF and ask anything</div>
+      </div>
+      <div class="ai-tool-arrow">→</div>
+    </a>
+    <a href="https://notebooklm.google.com" target="_blank" class="ai-tool-card ai-notebooklm">
+      <div class="ai-tool-logo">📓</div>
+      <div class="ai-tool-info">
+        <div class="ai-tool-name">Google NotebookLM</div>
+        <div class="ai-tool-desc">Create AI notebooks from PDFs</div>
+      </div>
+      <div class="ai-tool-arrow">→</div>
+    </a>
+    <a href="https://claude.ai" target="_blank" class="ai-tool-card ai-claude">
+      <div class="ai-tool-logo">◆</div>
+      <div class="ai-tool-info">
+        <div class="ai-tool-name">Claude by Anthropic</div>
+        <div class="ai-tool-desc">Deep document analysis & Q&A</div>
+      </div>
+      <div class="ai-tool-arrow">→</div>
+    </a>
+    <a href="https://chatgpt.com" target="_blank" class="ai-tool-card ai-gpt">
+      <div class="ai-tool-logo">◉</div>
+      <div class="ai-tool-info">
+        <div class="ai-tool-name">ChatGPT</div>
+        <div class="ai-tool-desc">Summarize & explain any PDF</div>
+      </div>
+      <div class="ai-tool-arrow">→</div>
+    </a>
+  </div>
+</section>
+
+<!-- FREE LIBRARY LINKS SECTION -->
+<section class="links-section">
+  <div class="ai-tools-header">
+    <div class="viz-tag" style="background:rgba(91,224,179,0.1);color:var(--accent3);border-color:rgba(91,224,179,0.2);">🌐 External Libraries</div>
+    <h2 class="viz-title">More <em style="background:linear-gradient(135deg,var(--accent3),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Free Resources</em></h2>
+    <p class="viz-sub">Trusted open-access repositories with millions of free academic papers, books, and documents.</p>
+  </div>
+  <div class="links-grid">
+
+    <div class="link-card">
+      <div class="link-card-top">
+        <div class="link-icon">🏛️</div>
+        <div>
+          <div class="link-name">National Digital Library of India</div>
+          <div class="link-url">ndl.iitkgp.ac.in</div>
+        </div>
+      </div>
+      <p class="link-desc">India's largest digital repository — millions of books, theses, and research papers across all disciplines.</p>
+      <a href="https://ndl.iitkgp.ac.in" target="_blank" class="link-btn">Open NDL →</a>
+    </div>
+
+    <div class="link-card">
+      <div class="link-card-top">
+        <div class="link-icon">🔬</div>
+        <div>
+          <div class="link-name">arXiv</div>
+          <div class="link-url">arxiv.org</div>
+        </div>
+      </div>
+      <p class="link-desc">2M+ preprints in physics, math, CS, economics, biology — free and open access, updated daily.</p>
+      <a href="https://arxiv.org" target="_blank" class="link-btn">Open arXiv →</a>
+    </div>
+
+    <div class="link-card">
+      <div class="link-card-top">
+        <div class="link-icon">📗</div>
+        <div>
+          <div class="link-name">Open Library</div>
+          <div class="link-url">openlibrary.org</div>
+        </div>
+      </div>
+      <p class="link-desc">Internet Archive's book library — borrow and read millions of books online for free, no fee.</p>
+      <a href="https://openlibrary.org" target="_blank" class="link-btn">Open Library →</a>
+    </div>
+
+    <div class="link-card">
+      <div class="link-card-top">
+        <div class="link-icon">🎓</div>
+        <div>
+          <div class="link-name">DOAJ</div>
+          <div class="link-url">doaj.org</div>
+        </div>
+      </div>
+      <p class="link-desc">Directory of Open Access Journals — peer-reviewed, free-to-read scientific and scholarly research.</p>
+      <a href="https://doaj.org" target="_blank" class="link-btn">Open DOAJ →</a>
+    </div>
+
+    <div class="link-card">
+      <div class="link-card-top">
+        <div class="link-icon">🧪</div>
+        <div>
+          <div class="link-name">PubMed Central</div>
+          <div class="link-url">ncbi.nlm.nih.gov/pmc</div>
+        </div>
+      </div>
+      <p class="link-desc">NIH's free full-text archive of biomedical and life sciences journal literature — millions of articles.</p>
+      <a href="https://www.ncbi.nlm.nih.gov/pmc/" target="_blank" class="link-btn">Open PMC →</a>
+    </div>
+
+    <div class="link-card">
+      <div class="link-card-top">
+        <div class="link-icon">🌍</div>
+        <div>
+          <div class="link-name">Project Gutenberg</div>
+          <div class="link-url">gutenberg.org</div>
+        </div>
+      </div>
+      <p class="link-desc">70,000+ free eBooks — classic literature, historical texts, and public domain works in multiple formats.</p>
+      <a href="https://www.gutenberg.org" target="_blank" class="link-btn">Open Gutenberg →</a>
+    </div>
+
+  </div>
+
+  <!-- EMBEDDED NOTEBOOKLM PREVIEW -->
+  <div class="embed-section">
+    <div class="embed-header">
+      <div class="viz-tag" style="background:rgba(66,133,244,0.1);color:#7ab4f5;border-color:rgba(66,133,244,0.2);">🔗 Embedded Tool</div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin:.5rem 0;">Try Google NotebookLM — right here</h3>
+      <p style="color:var(--muted);font-size:.9rem;margin-bottom:1.2rem;">Click below to open NotebookLM in an embedded panel. Upload any PDF and start chatting with it instantly.</p>
+    </div>
+    <div class="embed-container" id="embedContainer">
+      <div class="embed-placeholder" id="embedPlaceholder" onclick="loadEmbed()">
+        <div style="font-size:3rem;margin-bottom:.8rem;">📓</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:.4rem;">Click to open NotebookLM</div>
+        <div style="font-size:.85rem;color:var(--muted);">Opens in embedded panel — no new tab needed</div>
+        <div class="embed-launch-btn">▶ Launch NotebookLM</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1rem;">
+      <a href="https://notebooklm.google.com" target="_blank" class="link-btn" style="display:inline-block;">🔗 Open in new tab</a>
+      <a href="https://arxiv.org" target="_blank" class="link-btn" style="display:inline-block;">🔬 Find a paper on arXiv</a>
+      <a href="https://ndl.iitkgp.ac.in" target="_blank" class="link-btn" style="display:inline-block;">🏛️ Browse NDL India</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="logo" style="margin-bottom:.5rem;">PDFVault</div>
+    <p style="font-size:.8rem;color:var(--muted);max-width:400px;text-align:center;line-height:1.6;">Free knowledge for everyone. No login, no fees, no limits. Built with ♥ for learners worldwide.</p>
+    <div style="display:flex;gap:1.5rem;margin-top:1rem;flex-wrap:wrap;justify-content:center;">
+      <a href="https://arxiv.org" target="_blank" class="footer-link">arXiv</a>
+      <a href="https://ndl.iitkgp.ac.in" target="_blank" class="footer-link">NDL India</a>
+      <a href="https://openlibrary.org" target="_blank" class="footer-link">Open Library</a>
+      <a href="https://doaj.org" target="_blank" class="footer-link">DOAJ</a>
+      <a href="https://www.ncbi.nlm.nih.gov/pmc/" target="_blank" class="footer-link">PubMed</a>
+      <a href="https://www.gutenberg.org" target="_blank" class="footer-link">Gutenberg</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════
+// DATA
+// ═══════════════════════════════
+const TOPICS = [
+  {id:'all',name:'All PDFs',icon:'📚'},
+  {id:'Computer Science',name:'Computer Science',icon:'💻'},
+  {id:'Mathematics',name:'Mathematics',icon:'📐'},
+  {id:'Physics',name:'Physics',icon:'⚛️'},
+  {id:'Biology',name:'Biology',icon:'🧬'},
+  {id:'Chemistry',name:'Chemistry',icon:'🧪'},
+  {id:'History',name:'History',icon:'🏛️'},
+  {id:'Philosophy',name:'Philosophy',icon:'🦉'},
+  {id:'Economics',name:'Economics',icon:'📈'},
+  {id:'Psychology',name:'Psychology',icon:'🧠'},
+  {id:'Engineering',name:'Engineering',icon:'⚙️'},
+  {id:'Literature',name:'Literature',icon:'📖'},
+  {id:'Medicine',name:'Medicine',icon:'🏥'},
+  {id:'Law',name:'Law',icon:'⚖️'},
+];
+
+const SEED_PDFS = [
+  {id:1,title:'Introduction to Machine Learning',author:'Dr. Sarah Chen',topic:'Computer Science',year:2022,pages:340,rating:9.4,downloads:12840,desc:'A comprehensive introduction covering supervised and unsupervised learning, neural networks, and practical applications with Python.',analysis:'Excellent structure and depth. Covers fundamentals rigorously with good balance of theory and code examples. Highly recommended for beginners and intermediate learners.',content:`<h2>Introduction to Machine Learning</h2><p>Machine learning is a branch of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed.</p><h3>Chapter 1: Supervised Learning</h3><p>In supervised learning, we train models on labeled data. The algorithm learns a mapping from input features to output labels. Common algorithms include Linear Regression, Decision Trees, and Support Vector Machines.</p><p>The key challenge is generalization — building models that perform well not just on training data but on new, unseen examples. This requires techniques like cross-validation and regularization.</p><h3>Chapter 2: Neural Networks</h3><p>Artificial neural networks are computing systems loosely modeled after biological neural networks. They consist of interconnected nodes (neurons) organized in layers that process information using connectionist approaches to computation.</p><p>Deep learning uses multiple hidden layers to learn increasingly abstract representations of the data. This has led to breakthroughs in computer vision, natural language processing, and reinforcement learning.</p>`},
+  {id:2,title:'Quantum Mechanics: A Modern Perspective',author:'Prof. James Bohr',topic:'Physics',year:2021,pages:420,rating:9.1,downloads:8320,desc:'From wave functions to quantum field theory, this text bridges classical and modern physics with clear derivations.',analysis:'Rigorous mathematical treatment with excellent physical intuition. Strong on interpretations and applications. Minor gaps in quantum computing coverage.',content:`<h2>Quantum Mechanics: A Modern Perspective</h2><p>Quantum mechanics is the foundational theory of modern physics, governing the behavior of matter and energy at atomic and subatomic scales.</p><h3>The Wave Function</h3><p>The state of a quantum system is described by a wave function ψ(x,t), which contains all physical information about the system. The probability density of finding the particle at position x at time t is given by |ψ(x,t)|².</p><h3>The Schrödinger Equation</h3><p>The time-dependent Schrödinger equation governs the evolution of quantum states: iℏ ∂ψ/∂t = Ĥψ, where Ĥ is the Hamiltonian operator representing the total energy of the system.</p><p>This equation is linear, meaning superposition applies — a fundamental distinction from classical mechanics that leads to quantum interference and entanglement.</p>`},
+  {id:3,title:'Calculus and Its Applications',author:'Maria Santos',topic:'Mathematics',year:2020,pages:280,rating:8.7,downloads:19500,desc:'Clear, example-rich treatment of single and multivariable calculus for science and engineering students.',analysis:'Well-organized with abundant exercises. Explanations are accessible without sacrificing rigor. Good coverage of applications to real-world problems.',content:`<h2>Calculus and Its Applications</h2><p>Calculus is the mathematical study of continuous change. It has two major branches: differential calculus concerning rates of change, and integral calculus concerning accumulation of quantities.</p><h3>Limits and Continuity</h3><p>The concept of a limit is foundational to calculus. We say lim(x→a) f(x) = L if f(x) approaches L as x approaches a. This seemingly simple idea unlocks the entire theory of derivatives and integrals.</p><h3>The Derivative</h3><p>The derivative f'(x) measures the instantaneous rate of change of f at x. Geometrically, it is the slope of the tangent line to the graph at that point. Applications range from optimization to physics to economics.</p>`},
+  {id:4,title:'The Origins of Species',author:'Charles Darwin',topic:'Biology',year:1859,pages:502,rating:9.9,downloads:34200,desc:'The seminal work on natural selection and evolutionary theory that transformed our understanding of life on Earth.',analysis:'A landmark scientific text. Original prose is remarkably clear for its era. Essential reading for understanding the history and foundation of evolutionary biology.',content:`<h2>On the Origin of Species</h2><p>When on board H.M.S. Beagle, as naturalist, I was much struck with certain facts in the distribution of the inhabitants of South America, and in the geological relations of the present to the past inhabitants of that continent.</p><h3>Natural Selection</h3><p>How will the struggle for existence act in regard to variation? Can the principle of selection, which we have seen is so potent in the hands of man, apply in nature? I think we shall see that it can act most effectually.</p><p>If variations useful to any organic being do occur, assuredly individuals thus characterised will have the best chance of being preserved in the struggle for life; and from the strong principle of inheritance they will tend to produce offspring similarly characterised.</p>`},
+  {id:5,title:'Principles of Economics',author:'N. Gregory Mankiw',topic:'Economics',year:2021,pages:858,rating:8.9,downloads:22100,desc:'The best-selling economics textbook, covering microeconomics, macroeconomics, and international trade.',analysis:'Comprehensive and well-structured. Excellent use of real-world examples and case studies. Some chapters could be updated for post-pandemic economic realities.',content:`<h2>Principles of Economics</h2><p>Economics is the study of how society manages its scarce resources. In most societies, resources are allocated not by a central planner but through the combined actions of millions of households and firms.</p><h3>The Ten Principles</h3><p>People face trade-offs. The cost of something is what you give up to get it. Rational people think at the margin. People respond to incentives. Trade can make everyone better off. Markets are usually a good way to organize economic activity.</p><h3>Supply and Demand</h3><p>The tools of supply and demand allow us to analyze how events affect markets. The quantity demanded of any good is the amount that buyers are willing and able to purchase at a given price.</p>`},
+  {id:6,title:'The Human Brain: Structure and Function',author:'Dr. Rita Patel',topic:'Medicine',year:2023,pages:390,rating:9.3,downloads:7600,desc:'Modern neuroscience from anatomy to cognition, including neuroplasticity, disorders, and emerging therapies.',analysis:'Outstanding clarity and up-to-date content. Excellent diagrams and case studies. Strong coverage of neurological disorders and treatment approaches.',content:`<h2>The Human Brain</h2><p>The human brain is the most complex structure known in the universe. It contains approximately 86 billion neurons, each forming thousands of synaptic connections with other cells.</p><h3>Cerebral Cortex</h3><p>The cerebral cortex is the outermost layer of the brain and is responsible for higher-order functions including cognition, language, memory, and consciousness. It is divided into four lobes: frontal, parietal, temporal, and occipital.</p><h3>Neuroplasticity</h3><p>The brain is not a static organ. Through a process called neuroplasticity, it continually reorganizes itself by forming new neural connections throughout life. This capacity underlies learning, memory, and recovery from injury.</p>`},
+  {id:7,title:'A History of the Ancient World',author:'Susan Wise Bauer',topic:'History',year:2018,pages:896,rating:8.5,downloads:9800,desc:'From early Sumer and Egypt through the fall of Rome, a narrative history of the ancient world.',analysis:'Engaging narrative with strong sourcing. Covers underrepresented civilizations well. Dense but rewarding. Good bibliography for further research.',content:`<h2>A History of the Ancient World</h2><p>History begins where literacy begins. The first written records appear in Sumer around 3200 BC — not as literature or religion, but as accounting records. The need to keep track of grain, sheep, and trade created writing.</p><h3>The Rise of Egypt</h3><p>Along the Nile, a civilization was coalescing that would last, in recognizable form, for three thousand years. The unification of Upper and Lower Egypt under the first pharaohs around 3100 BC created one of history's most enduring political structures.</p>`},
+  {id:8,title:'Cognitive Psychology',author:'Prof. Alan Baddeley',topic:'Psychology',year:2022,pages:456,rating:8.8,downloads:14300,desc:'Memory, attention, language, and decision-making explored through landmark experiments and modern cognitive science.',analysis:'Excellent balance of classic research and contemporary findings. Clear writing with strong pedagogical structure. Recommended for both students and practitioners.',content:`<h2>Cognitive Psychology</h2><p>Cognitive psychology is the scientific study of mental processes such as attention, language use, memory, perception, problem solving, creativity, and reasoning.</p><h3>Models of Memory</h3><p>Atkinson and Shiffrin's modal model proposed three distinct memory stores: sensory register, short-term memory, and long-term memory. Information flows sequentially through these stores, with rehearsal serving as the key process for transfer to long-term storage.</p><h3>Working Memory</h3><p>Baddeley and Hitch replaced the concept of short-term memory with the more complex working memory model, comprising a central executive, phonological loop, visuospatial sketchpad, and episodic buffer.</p>`},
+];
+
+// ═══════════════════════════════
+// STATE
+// ═══════════════════════════════
+let pdfs = [...SEED_PDFS];
+let currentTopic = 'all';
+let currentSort = 'rating';
+let searchQuery = '';
+let selectedFile = null;
+let currentPdf = null;
+
+// ═══════════════════════════════
+// INIT
+// ═══════════════════════════════
+function init() {
+  renderTopics();
+  renderPdfs();
+  updateStats();
+  setupDragDrop();
+}
+
+// ═══════════════════════════════
+// TOPICS SIDEBAR
+// ═══════════════════════════════
+function renderTopics() {
+  const list = document.getElementById('topicList');
+  list.innerHTML = TOPICS.map(t => {
+    const count = t.id === 'all' ? pdfs.length : pdfs.filter(p=>p.topic===t.id).length;
+    return `<button class="topic-btn ${currentTopic===t.id?'active':''}" onclick="setTopic('${t.id}')">
+      <span><span class="topic-icon">${t.icon}</span>${t.name}</span>
+      <span class="count">${count}</span>
+    </button>`;
+  }).join('');
+}
+
+function setTopic(id) {
+  currentTopic = id;
+  renderTopics();
+  renderPdfs();
+}
+
+// ═══════════════════════════════
+// PDF GRID
+// ═══════════════════════════════
+function getFilteredPdfs() {
+  let list = [...pdfs];
+  if (currentTopic !== 'all') list = list.filter(p=>p.topic===currentTopic);
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    list = list.filter(p=>
+      p.title.toLowerCase().includes(q)||
+      p.author.toLowerCase().includes(q)||
+      p.topic.toLowerCase().includes(q)||
+      p.desc.toLowerCase().includes(q)
+    );
+  }
+  switch(currentSort) {
+    case 'rating': list.sort((a,b)=>b.rating-a.rating); break;
+    case 'newest': list.sort((a,b)=>b.year-a.year); break;
+    case 'downloads': list.sort((a,b)=>b.downloads-a.downloads); break;
+    case 'pages': list.sort((a,b)=>a.pages-b.pages); break;
+  }
+  return list;
+}
+
+function ratingClass(r) {
+  if(r>=9) return 'rating-high';
+  if(r>=7.5) return 'rating-med';
+  return 'rating-low';
+}
+function ratingEmoji(r) {
+  if(r>=9) return '★';
+  if(r>=7.5) return '◆';
+  return '▲';
+}
+
+function renderPdfs() {
+  const list = getFilteredPdfs();
+  const grid = document.getElementById('pdfGrid');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('resultCount').textContent = list.length;
+
+  if(!list.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+
+  grid.innerHTML = list.map(p=>`
+    <div class="pdf-card" onclick="openViewer(${p.id})">
+      <div class="card-top">
+        <div class="card-icon">📄</div>
+        <div class="card-meta">
+          <div class="rating-badge ${ratingClass(p.rating)}">${ratingEmoji(p.rating)} ${p.rating}</div>
+          <div class="card-pages">${p.pages} pages · ${p.year}</div>
+        </div>
+      </div>
+      <div class="card-title">${p.title}</div>
+      <div class="card-summary">${p.desc.substring(0,120)}…</div>
+      <div class="card-footer">
+        <span class="card-topic">${p.topic}</span>
+        <span class="card-downloads">⬇ ${(p.downloads/1000).toFixed(1)}k</span>
+      </div>
+      <button class="open-btn">📖 Read Now — Free</button>
+    </div>
+  `).join('');
+}
+
+function handleSearch() {
+  searchQuery = document.getElementById('searchInput').value;
+  renderPdfs();
+}
+
+function handleSort(val) {
+  currentSort = val;
+  renderPdfs();
+}
+
+function updateStats() {
+  document.getElementById('totalCount').textContent = pdfs.length;
+  document.getElementById('topicCount').textContent = TOPICS.length - 1;
+}
+
+// ═══════════════════════════════
+// UPLOAD MODAL
+// ═══════════════════════════════
+function openUpload() {
+  document.getElementById('uploadModal').classList.add('open');
+  document.getElementById('aiPanel').classList.remove('visible');
+  document.getElementById('uploadTitle').value='';
+  document.getElementById('uploadAuthor').value='';
+  document.getElementById('uploadTopic').value='';
+  document.getElementById('uploadYear').value='';
+  document.getElementById('uploadDesc').value='';
+  selectedFile = null;
+  const dz = document.getElementById('dropZone');
+  dz.innerHTML=`<div class="drop-icon">📄</div><div class="drop-text"><strong>Click to choose</strong> or drag & drop your PDF here</div><div class="drop-text" style="font-size:.75rem;margin-top:.3rem;">Max 50MB · PDF only</div><input type="file" id="fileInput" accept=".pdf" style="display:none" onchange="handleFile(this)"/>`;
+}
+function closeUpload(){document.getElementById('uploadModal').classList.remove('open');}
+
+function setupDragDrop(){
+  const dz = document.getElementById('dropZone');
+  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
+  dz.addEventListener('drop',e=>{
+    e.preventDefault();dz.classList.remove('dragover');
+    const f=e.dataTransfer.files[0];
+    if(f&&f.type==='application/pdf') setFile(f);
+    else showToast('Please drop a PDF file','error');
+  });
+}
+
+function handleFile(input){if(input.files[0]) setFile(input.files[0]);}
+function setFile(f){
+  selectedFile=f;
+  const dz=document.getElementById('dropZone');
+  dz.innerHTML=`<div class="drop-icon">✅</div><div class="drop-text"><strong>${f.name}</strong></div><div class="drop-text" style="font-size:.75rem;margin-top:.3rem;">${(f.size/1024/1024).toFixed(2)} MB</div>`;
+  if(!document.getElementById('uploadTitle').value)
+    document.getElementById('uploadTitle').value=f.name.replace('.pdf','');
+}
+
+// ═══════════════════════════════
+// AI ANALYSIS (Simulated)
+// ═══════════════════════════════
+async function runAIAnalysis(){
+  const title = document.getElementById('uploadTitle').value.trim();
+  const topic = document.getElementById('uploadTopic').value;
+  const desc = document.getElementById('uploadDesc').value.trim();
+
+  if(!title){showToast('Please enter a title','error');return;}
+  if(!topic){showToast('Please select a topic','error');return;}
+
+  const btn = document.getElementById('analyzeBtn');
+  btn.innerHTML = '<span class="loading-spinner"></span> Analyzing…';
+  btn.disabled = true;
+
+  // Simulate AI analysis
+  await sleep(800);
+  const panel = document.getElementById('aiPanel');
+  const result = document.getElementById('aiResult');
+  panel.classList.add('visible');
+  result.innerHTML = `<span class="ai-dot" style="display:inline-block;margin-right:6px;"></span> Reading document structure…`;
+
+  await sleep(900);
+  result.innerHTML += `<br>✓ Extracting topics and keywords…`;
+  await sleep(700);
+  result.innerHTML += `<br>✓ Evaluating content quality and relevance…`;
+  await sleep(800);
+
+  // Generate score
+  const score = (7 + Math.random()*2.5).toFixed(1);
+  const accepted = parseFloat(score) >= 7.0;
+  const sc = parseFloat(score);
+  const scoreClass = sc>=9?'score-high':sc>=7.5?'score-med':'score-low';
+  const rClass = sc>=9?'rating-high':sc>=7.5?'rating-med':'rating-low';
+
+  const verdicts = accepted ? [
+    'High quality document with strong relevance to the selected topic. Clear structure and well-cited content.',
+    'Good educational resource. Well-organized with accurate information appropriate for the topic.',
+    'Solid contribution to the library. Content is accurate, clearly written, and topically relevant.'
+  ] : [
+    'Content does not sufficiently match the selected topic. Please re-categorize or improve the document.',
+    'Quality score below threshold. The document lacks structure or sufficient topical relevance.',
+  ];
+  const verdict = verdicts[Math.floor(Math.random()*verdicts.length)];
+  const fill = Math.round(sc*10);
+
+  result.innerHTML=`
+    <p><strong>Analysis complete.</strong> ${verdict}</p>
+    <div class="ai-score">
+      <div class="score-circle ${scoreClass}">${score}</div>
+      <div class="score-info">
+        <div class="score-label">${accepted?'✅ Accepted to Library':'❌ Did Not Meet Threshold'}</div>
+        <div class="score-verdict">${accepted?'Your PDF has been added successfully.':'Score below 7.0. Please review and resubmit.'}</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%;background:${sc>=9?'var(--accent3)':sc>=7.5?'var(--accent)':'var(--accent2)'}" id="progressFill"></div></div>
+      </div>
+    </div>`;
+
+  setTimeout(()=>{
+    const pf=document.getElementById('progressFill');
+    if(pf)pf.style.width=fill+'%';
+  },100);
+
+  btn.innerHTML='🤖 Analyze with AI & Submit';
+  btn.disabled=false;
+
+  if(accepted){
+    // Add to library
+    const newPdf = {
+      id: Date.now(),
+      title,
+      author: document.getElementById('uploadAuthor').value||'Unknown Author',
+      topic,
+      year: parseInt(document.getElementById('uploadYear').value)||new Date().getFullYear(),
+      pages: Math.floor(Math.random()*300+50),
+      rating: parseFloat(score),
+      downloads: 0,
+      desc: desc||`A ${topic} document: ${title}.`,
+      analysis: verdict,
+      content: `<h2>${title}</h2><p>This document has been successfully analyzed and added to the PDFVault library.</p><p>${desc||'No description provided.'}</p><p><em>This is a user-contributed document. Content is displayed as submitted.</em></p>`
+    };
+    pdfs.unshift(newPdf);
+    renderTopics();
+    renderPdfs();
+    updateStats();
+    showToast('✅ PDF added to library!','success');
+    setTimeout(closeUpload,2200);
+  } else {
+    showToast('PDF did not pass AI review','error');
+  }
+}
+
+// ═══════════════════════════════
+// PDF VIEWER
+// ═══════════════════════════════
+function openViewer(id){
+  const p = pdfs.find(x=>x.id===id);
+  if(!p)return;
+  currentPdf=p;
+  p.downloads++;
+
+  document.getElementById('viewerTitle').textContent=p.title;
+  const rClass=p.rating>=9?'rating-high':p.rating>=7.5?'rating-med':'rating-low';
+  document.getElementById('viewerRating').className=`rating-badge ${rClass}`;
+  document.getElementById('viewerRating').textContent=`★ ${p.rating}`;
+  document.getElementById('viewerDesc').textContent=p.desc;
+  document.getElementById('viewerTopic').textContent=p.topic;
+  document.getElementById('viewerAuthor').textContent=p.author+` (${p.year})`;
+  document.getElementById('viewerAnalysis').textContent=p.analysis||'AI analysis not available.';
+  
+  const sc=p.rating;
+  const scClass=sc>=9?'score-high':sc>=7.5?'score-med':'score-low';
+  document.getElementById('viewerScore').innerHTML=`<div class="ai-score"><div class="score-circle ${scClass}">${p.rating}</div><div class="score-info"><div class="score-label">${sc>=9?'Excellent':sc>=7.5?'Good':'Acceptable'}</div><div class="score-verdict">AI Quality Rating</div></div></div>`;
+
+  document.getElementById('pdfPreview').innerHTML=`
+    <div class="pdf-page-sim">${p.content||'<p>No preview available.</p>'}</div>
+    <div style="font-family:var(--font-mono,monospace);font-size:.75rem;color:var(--muted);text-align:center;padding:1rem;">
+      Page 1 of ${p.pages} — Free to read & download
+    </div>`;
+
+  document.getElementById('viewerModal').classList.add('open');
+  renderPdfs();
+}
+
+function closeViewer(){document.getElementById('viewerModal').classList.remove('open');}
+
+function downloadPdf(){
+  if(!currentPdf)return;
+  showToast('⬇ Download started!','success');
+  // In real app: trigger actual PDF download
+  const a=document.createElement('a');
+  a.href='#';
+  a.download=currentPdf.title+'.pdf';
+}
+
+// ═══════════════════════════════
+// UTILITIES
+// ═══════════════════════════════
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className=`toast toast-${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function showStats(){
+  showToast(`📊 ${pdfs.length} PDFs · ${TOPICS.length-1} topics · All free!`,'success');
+}
+
+// ═══════════════════════════════
+// CLOSE ON OVERLAY CLICK
+// ═══════════════════════════════
+document.getElementById('uploadModal').addEventListener('click',function(e){
+  if(e.target===this)closeUpload();
+});
+
+init();
+
+// ═══════════════════════════════
+// VISUALIZATIONS
+// ═══════════════════════════════
+let vizRendered = false;
+
+function toggleViz() {
+  const grid = document.getElementById('vizGrid');
+  const btn = document.getElementById('vizToggleBtn');
+  const visible = grid.style.display !== 'none';
+  if (visible) {
+    grid.style.display = 'none';
+    btn.innerHTML = '<span>▶ Show Visualizations</span>';
+  } else {
+    grid.style.display = 'grid';
+    btn.innerHTML = '<span>▼ Hide Visualizations</span>';
+    if (!vizRendered) { renderVisualizations(); vizRendered = true; }
+  }
+}
+
+function renderVisualizations() {
+  renderBarChart();
+  renderDonut();
+  renderSparkList();
+}
+
+function renderBarChart() {
+  const topicCounts = {};
+  pdfs.forEach(p => { topicCounts[p.topic] = (topicCounts[p.topic]||0)+1; });
+  const sorted = Object.entries(topicCounts).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const max = sorted[0][1];
+  const el = document.getElementById('barChart');
+  el.innerHTML = sorted.map(([t,c]) => `
+    <div class="bar-row">
+      <div class="bar-label">${t.length>12?t.substring(0,12)+'…':t}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:0%" data-target="${Math.round(c/max*100)}"></div></div>
+      <div class="bar-count">${c}</div>
+    </div>`).join('');
+  setTimeout(() => {
+    el.querySelectorAll('.bar-fill').forEach(b => b.style.width = b.dataset.target + '%');
+  }, 100);
+}
+
+function renderDonut() {
+  const canvas = document.getElementById('donutChart');
+  const ctx = canvas.getContext('2d');
+  const high = pdfs.filter(p=>p.rating>=9).length;
+  const med = pdfs.filter(p=>p.rating>=7.5&&p.rating<9).length;
+  const low = pdfs.filter(p=>p.rating<7.5).length;
+  const data = [high, med, low];
+  const colors = ['#5be0b3','#f0b429','#e05b5b'];
+  const labels = ['9+ Excellent','7.5–9 Good','<7.5 Fair'];
+  const total = data.reduce((a,b)=>a+b,0);
+  const cx=100,cy=100,r=75,ir=48;
+  let angle = -Math.PI/2;
+  data.forEach((v,i) => {
+    const slice = (v/total)*Math.PI*2;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,angle,angle+slice);
+    ctx.closePath();
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+    angle += slice;
+  });
+  ctx.beginPath();
+  ctx.arc(cx,cy,ir,0,Math.PI*2);
+  ctx.fillStyle = '#141420';
+  ctx.fill();
+  ctx.fillStyle = '#e8e6f0';
+  ctx.font = 'bold 20px Syne,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(total, cx, cy+4);
+  ctx.font = '11px DM Mono,monospace';
+  ctx.fillStyle = '#7a7890';
+  ctx.fillText('PDFs', cx, cy+18);
+  const legend = document.getElementById('donutLegend');
+  legend.innerHTML = data.map((v,i) => `
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${colors[i]}"></div>
+      ${labels[i]}: ${v}
+    </div>`).join('');
+}
+
+function renderSparkList() {
+  const sorted = [...pdfs].sort((a,b)=>b.downloads-a.downloads).slice(0,5);
+  const max = sorted[0].downloads;
+  const el = document.getElementById('sparkList');
+  el.innerHTML = sorted.map((p,i) => `
+    <div class="spark-row">
+      <div class="spark-rank ${i===0?'r1':i===1?'r2':i===2?'r3':''}">#${i+1}</div>
+      <div class="spark-info">
+        <div class="spark-title">${p.title}</div>
+        <div class="spark-track"><div class="spark-fill" style="width:0%" data-target="${Math.round(p.downloads/max*100)}"></div></div>
+      </div>
+      <div class="spark-num">${(p.downloads/1000).toFixed(1)}k</div>
+    </div>`).join('');
+  setTimeout(() => {
+    el.querySelectorAll('.spark-fill').forEach(b => b.style.width = b.dataset.target + '%');
+  }, 200);
+}
+
+// ═══════════════════════════════
+// EMBED
+// ═══════════════════════════════
+function loadEmbed() {
+  const c = document.getElementById('embedContainer');
+  c.innerHTML = `<iframe class="notebooklm-frame" src="https://notebooklm.google.com" title="Google NotebookLM" allow="clipboard-write" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"></iframe>`;
+  showToast('📓 NotebookLM loaded!', 'success');
+}
+</script>
+</body>
+</html>
