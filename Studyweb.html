@@ -1,1449 +1,1119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>PDFVault — Free Knowledge Library</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sripa AP EAPCET</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00d4ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sripa EAPCET">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
   :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --surface2: #1a1a28;
-    --border: rgba(255,255,255,0.07);
-    --accent: #f0b429;
-    --accent2: #e05b5b;
-    --accent3: #5be0b3;
-    --text: #e8e6f0;
-    --muted: #7a7890;
-    --card: #141420;
+    --bg: #0a0f1e;
+    --surface: #111827;
+    --card: #1a2236;
+    --border: #1e3a5f;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --font-head: 'Rajdhani', sans-serif;
+    --font-body: 'Nunito', sans-serif;
   }
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{
-    font-family:'Lora',serif;
-    background:var(--bg);
-    color:var(--text);
-    min-height:100vh;
-    overflow-x:hidden;
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
   }
-  /* Background grain */
-  body::before{
+
+  /* ─── BG GRID ─── */
+  body::before {
     content:'';
-    position:fixed;inset:0;
-    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events:none;z-index:0;opacity:.4;
-  }
-
-  /* NAV */
-  nav{
-    position:sticky;top:0;z-index:100;
-    display:flex;align-items:center;justify-content:space-between;
-    padding:0 2.5rem;height:64px;
-    background:rgba(10,10,15,0.85);
-    backdrop-filter:blur(20px);
-    border-bottom:1px solid var(--border);
-  }
-  .logo{
-    font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;
-    letter-spacing:-0.03em;
-    background:linear-gradient(135deg,var(--accent),#ff8c42);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  }
-  .logo span{color:var(--text);-webkit-text-fill-color:var(--muted);font-weight:400;font-size:0.85rem;margin-left:8px;vertical-align:middle;}
-  .nav-actions{display:flex;gap:12px;align-items:center;}
-  .btn{
-    font-family:'Syne',sans-serif;font-size:0.8rem;font-weight:600;letter-spacing:0.05em;
-    padding:8px 18px;border-radius:6px;cursor:pointer;transition:all .2s;border:none;
-  }
-  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
-  .btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.2);}
-  .btn-accent{background:var(--accent);color:#0a0a0f;}
-  .btn-accent:hover{background:#f5c842;transform:translateY(-1px);box-shadow:0 4px 20px rgba(240,180,41,0.3);}
-
-  /* HERO */
-  .hero{
-    position:relative;
-    padding:5rem 2.5rem 3rem;
-    text-align:center;
-    overflow:hidden;
-  }
-  .hero-glow{
-    position:absolute;top:-80px;left:50%;transform:translateX(-50%);
-    width:600px;height:400px;
-    background:radial-gradient(ellipse,rgba(240,180,41,0.12) 0%,transparent 70%);
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(0,212,255,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,.04) 1px, transparent 1px);
+    background-size: 40px 40px;
     pointer-events:none;
-  }
-  .hero h1{
-    font-family:'Syne',sans-serif;font-size:clamp(2.5rem,6vw,5rem);
-    font-weight:800;letter-spacing:-0.04em;line-height:1;
-    margin-bottom:1.2rem;
-  }
-  .hero h1 em{
-    font-style:normal;
-    background:linear-gradient(135deg,var(--accent),#ff6b35);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  }
-  .hero p{
-    font-size:1.1rem;color:var(--muted);max-width:560px;margin:0 auto 2.5rem;line-height:1.7;
-    font-style:italic;
+    z-index:0;
   }
 
-  /* SEARCH BAR */
-  .search-wrap{
-    max-width:680px;margin:0 auto 1rem;
-    position:relative;
-  }
-  .search-input{
-    width:100%;padding:1rem 1rem 1rem 3.2rem;
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:12px;
-    color:var(--text);font-family:'Lora',serif;font-size:1rem;
-    outline:none;transition:border-color .2s,box-shadow .2s;
-  }
-  .search-input:focus{
-    border-color:rgba(240,180,41,0.4);
-    box-shadow:0 0 0 3px rgba(240,180,41,0.08);
-  }
-  .search-icon{
-    position:absolute;left:1rem;top:50%;transform:translateY(-50%);
-    color:var(--muted);pointer-events:none;font-size:1.1rem;
-  }
-  .search-input::placeholder{color:var(--muted);}
+  /* ─── SCREENS ─── */
+  .screen { display:none; min-height:100vh; position:relative; z-index:1; animation: fadeIn .4s ease; }
+  .screen.active { display:flex; flex-direction:column; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
 
-  /* STATS */
-  .stats{
-    display:flex;justify-content:center;gap:3rem;
-    padding:1.5rem 2.5rem;
-    border-top:1px solid var(--border);border-bottom:1px solid var(--border);
-    background:var(--surface);
-    margin-bottom:0;
+  /* ─── TOPBAR ─── */
+  .topbar {
+    background: rgba(17,24,39,.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:100;
   }
-  .stat{text-align:center;}
-  .stat-num{
-    font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;
-    color:var(--accent);display:block;
+  .logo { font-family:var(--font-head); font-size:1.4rem; font-weight:700; letter-spacing:.5px; }
+  .logo span { color:var(--accent); }
+  .user-chip {
+    display:flex; align-items:center; gap:8px;
+    background:var(--card); border:1px solid var(--border);
+    padding:6px 12px; border-radius:20px; font-size:.8rem; cursor:pointer;
   }
-  .stat-label{font-size:0.75rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;font-family:'DM Mono',monospace;}
+  .avatar { width:26px; height:26px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:grid; place-items:center; font-size:.7rem; font-weight:700; }
 
-  /* MAIN LAYOUT */
-  .main{display:flex;gap:0;min-height:calc(100vh - 200px);}
-  
-  /* SIDEBAR */
-  .sidebar{
-    width:260px;min-width:260px;
-    border-right:1px solid var(--border);
-    padding:1.5rem;
-    background:var(--surface);
-    position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;
+  /* ─── AUTH ─── */
+  .auth-wrap {
+    flex:1; display:flex; align-items:center; justify-content:center; padding:20px;
   }
-  .sidebar::-webkit-scrollbar{width:4px;}
-  .sidebar::-webkit-scrollbar-track{background:transparent;}
-  .sidebar::-webkit-scrollbar-thumb{background:var(--border);}
-  .sidebar-title{
-    font-family:'Syne',sans-serif;font-size:0.7rem;letter-spacing:0.12em;
-    text-transform:uppercase;color:var(--muted);margin-bottom:1rem;
+  .auth-box {
+    width:100%; max-width:460px;
+    background:var(--card); border:1px solid var(--border);
+    border-radius:20px; padding:36px 32px;
+    box-shadow: 0 0 60px rgba(0,212,255,.07);
   }
-  .topic-btn{
-    display:flex;align-items:center;justify-content:space-between;
-    width:100%;padding:9px 12px;border-radius:8px;
-    background:transparent;border:none;cursor:pointer;
-    color:var(--muted);font-family:'Syne',sans-serif;font-size:0.82rem;font-weight:600;
-    transition:all .15s;margin-bottom:3px;text-align:left;
+  .auth-title { font-family:var(--font-head); font-size:2rem; font-weight:700; margin-bottom:4px; }
+  .auth-title span { color:var(--accent); }
+  .auth-sub { color:var(--muted); font-size:.9rem; margin-bottom:28px; }
+  .tab-row { display:flex; gap:8px; margin-bottom:24px; }
+  .tab-btn {
+    flex:1; padding:10px; border-radius:10px; border:1px solid var(--border);
+    background:transparent; color:var(--muted); font-family:var(--font-body); font-size:.9rem;
+    cursor:pointer; transition:.2s;
   }
-  .topic-btn:hover{background:var(--surface2);color:var(--text);}
-  .topic-btn.active{background:rgba(240,180,41,0.12);color:var(--accent);}
-  .topic-btn .count{
-    font-family:'DM Mono',monospace;font-size:0.7rem;
-    background:var(--surface2);padding:2px 7px;border-radius:20px;
-  }
-  .topic-btn.active .count{background:rgba(240,180,41,0.2);color:var(--accent);}
-  .topic-icon{margin-right:8px;font-size:0.9rem;}
+  .tab-btn.active { background:var(--accent); border-color:var(--accent); color:#000; font-weight:700; }
 
-  /* CONTENT AREA */
-  .content{flex:1;padding:1.5rem 2rem;overflow-y:auto;}
-  
-  /* TOOLBAR */
-  .toolbar{
-    display:flex;align-items:center;justify-content:space-between;
-    margin-bottom:1.5rem;
+  /* ─── FORM ─── */
+  .field { margin-bottom:16px; }
+  .field label { display:block; font-size:.8rem; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
+  .field input, .field select, .field textarea {
+    width:100%; padding:12px 14px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; color:var(--text); font-family:var(--font-body); font-size:.95rem;
+    outline:none; transition:.2s;
   }
-  .toolbar-left{font-family:'Syne',sans-serif;font-size:0.85rem;color:var(--muted);}
-  .toolbar-left strong{color:var(--text);}
-  .sort-select{
-    background:var(--surface);border:1px solid var(--border);
-    color:var(--text);font-family:'Syne',sans-serif;font-size:0.8rem;
-    padding:6px 12px;border-radius:6px;cursor:pointer;outline:none;
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,212,255,.1);
   }
+  .field textarea { resize:vertical; min-height:80px; }
 
-  /* PDF GRID */
-  .pdf-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-    gap:1.2rem;
+  .btn {
+    width:100%; padding:13px; border-radius:12px; border:none; cursor:pointer;
+    font-family:var(--font-body); font-size:1rem; font-weight:700; transition:.2s;
   }
-  .pdf-card{
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:1.2rem;
-    cursor:pointer;
-    transition:all .2s;
-    position:relative;overflow:hidden;
-  }
-  .pdf-card::before{
-    content:'';position:absolute;top:0;left:0;right:0;height:3px;
-    background:linear-gradient(90deg,var(--accent),transparent);
-    opacity:0;transition:opacity .2s;
-  }
-  .pdf-card:hover{
-    border-color:rgba(240,180,41,0.25);
-    transform:translateY(-2px);
-    box-shadow:0 8px 30px rgba(0,0,0,0.3);
-  }
-  .pdf-card:hover::before{opacity:1;}
-  .card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.9rem;}
-  .card-icon{
-    width:44px;height:56px;
-    background:linear-gradient(135deg,rgba(240,180,41,0.15),rgba(240,180,41,0.05));
-    border:1px solid rgba(240,180,41,0.2);
-    border-radius:6px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:1.3rem;flex-shrink:0;
-  }
-  .card-meta{text-align:right;}
-  .rating-badge{
-    display:inline-flex;align-items:center;gap:4px;
-    font-family:'DM Mono',monospace;font-size:0.75rem;
-    padding:3px 8px;border-radius:20px;font-weight:500;
-  }
-  .rating-high{background:rgba(91,224,179,0.15);color:var(--accent3);}
-  .rating-med{background:rgba(240,180,41,0.15);color:var(--accent);}
-  .rating-low{background:rgba(224,91,91,0.15);color:var(--accent2);}
-  .card-pages{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);margin-top:4px;}
-  .card-title{
-    font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;
-    line-height:1.3;margin-bottom:.5rem;color:var(--text);
-  }
-  .card-summary{font-size:0.8rem;color:var(--muted);line-height:1.6;margin-bottom:.9rem;}
-  .card-footer{display:flex;align-items:center;justify-content:space-between;}
-  .card-topic{
-    font-family:'Syne',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.06em;
-    padding:3px 10px;border-radius:20px;
-    background:var(--surface2);color:var(--muted);
-  }
-  .card-downloads{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);}
-  .open-btn{
-    display:flex;align-items:center;gap:6px;
-    margin-top:.8rem;padding:7px 14px;border-radius:6px;
-    background:transparent;border:1px solid var(--border);
-    color:var(--text);font-family:'Syne',sans-serif;font-size:0.75rem;font-weight:600;
-    cursor:pointer;transition:all .15s;width:100%;justify-content:center;
-  }
-  .open-btn:hover{background:rgba(240,180,41,0.1);border-color:rgba(240,180,41,0.3);color:var(--accent);}
+  .btn-primary { background:var(--accent); color:#000; }
+  .btn-primary:hover { background:#00b8d9; transform:translateY(-1px); }
+  .btn-secondary { background:var(--card); color:var(--text); border:1px solid var(--border); }
+  .btn-secondary:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-danger { background:var(--danger); color:#fff; }
+  .btn-warn { background:var(--warn); color:#000; }
+  .btn-green { background:var(--accent3); color:#000; }
+  .btn-purple { background:var(--accent2); color:#fff; }
+  .btn-sm { padding:8px 16px; width:auto; font-size:.85rem; border-radius:8px; }
 
-  /* UPLOAD MODAL */
-  .modal-overlay{
-    display:none;position:fixed;inset:0;
-    background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);
-    z-index:200;align-items:center;justify-content:center;
-  }
-  .modal-overlay.open{display:flex;}
-  .modal{
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:16px;
-    width:min(600px,95vw);
-    max-height:90vh;overflow-y:auto;
-    padding:2rem;
-    animation:modalIn .25s ease;
-  }
-  @keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
-  .modal-header{
-    display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;
-  }
-  .modal-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;}
-  .close-btn{
-    background:var(--surface2);border:none;color:var(--muted);
-    width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1rem;
-    transition:all .15s;
-  }
-  .close-btn:hover{color:var(--text);background:rgba(255,255,255,0.1);}
-  .drop-zone{
-    border:2px dashed rgba(240,180,41,0.3);
-    border-radius:12px;
-    padding:2.5rem;text-align:center;
-    cursor:pointer;transition:all .2s;margin-bottom:1.5rem;
-    background:rgba(240,180,41,0.03);
-  }
-  .drop-zone:hover,.drop-zone.dragover{
-    border-color:rgba(240,180,41,0.6);
-    background:rgba(240,180,41,0.06);
-  }
-  .drop-icon{font-size:2.5rem;margin-bottom:.8rem;}
-  .drop-text{font-family:'Syne',sans-serif;font-size:0.9rem;color:var(--muted);}
-  .drop-text strong{color:var(--accent);}
-  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
-  .form-group{margin-bottom:1rem;}
-  .form-label{
-    display:block;font-family:'Syne',sans-serif;font-size:0.78rem;font-weight:600;
-    letter-spacing:0.06em;color:var(--muted);margin-bottom:.4rem;
-    text-transform:uppercase;
-  }
-  .form-input,.form-select,.form-textarea{
-    width:100%;padding:.7rem 1rem;
-    background:var(--surface2);border:1px solid var(--border);
-    border-radius:8px;color:var(--text);
-    font-family:'Lora',serif;font-size:.9rem;
-    outline:none;transition:border-color .15s;
-  }
-  .form-input:focus,.form-select:focus,.form-textarea:focus{
-    border-color:rgba(240,180,41,0.4);
-  }
-  .form-textarea{resize:vertical;min-height:80px;}
-  .form-select option{background:var(--surface2);}
-  
-  /* AI ANALYSIS PANEL */
-  .ai-panel{
-    background:rgba(91,224,179,0.05);
-    border:1px solid rgba(91,224,179,0.15);
-    border-radius:12px;padding:1.2rem;margin-top:1rem;
-    display:none;
-  }
-  .ai-panel.visible{display:block;animation:fadeIn .4s ease;}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-  .ai-panel-header{
-    display:flex;align-items:center;gap:.6rem;
-    font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;
-    color:var(--accent3);margin-bottom:.8rem;
-  }
-  .ai-dot{
-    width:8px;height:8px;border-radius:50%;background:var(--accent3);
-    animation:pulse 1.5s infinite;
-  }
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-  .ai-result{font-size:.85rem;color:var(--muted);line-height:1.7;}
-  .ai-result strong{color:var(--text);}
-  .ai-score{
-    display:flex;align-items:center;gap:1rem;margin-top:.8rem;
-    padding:.8rem;background:var(--surface);border-radius:8px;
-  }
-  .score-circle{
-    width:52px;height:52px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;
-    flex-shrink:0;
-  }
-  .score-high{background:rgba(91,224,179,0.15);color:var(--accent3);border:2px solid rgba(91,224,179,0.3);}
-  .score-med{background:rgba(240,180,41,0.15);color:var(--accent);border:2px solid rgba(240,180,41,0.3);}
-  .score-low{background:rgba(224,91,91,0.15);color:var(--accent2);border:2px solid rgba(224,91,91,0.3);}
-  .score-info{flex:1;}
-  .score-label{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;margin-bottom:3px;}
-  .score-verdict{font-size:.78rem;color:var(--muted);}
-  .progress-bar{
-    height:4px;background:var(--surface2);border-radius:2px;margin-top:.8rem;overflow:hidden;
-  }
-  .progress-fill{height:100%;border-radius:2px;transition:width 1s ease;background:linear-gradient(90deg,var(--accent3),var(--accent));}
+  .otp-row { display:flex; gap:8px; }
+  .otp-row input { flex:1; text-align:center; font-size:1.1rem; letter-spacing:2px; }
+  .otp-row .btn { width:auto; padding:12px 20px; border-radius:10px; white-space:nowrap; }
 
-  /* PDF VIEWER MODAL */
-  .viewer-modal{
-    display:none;position:fixed;inset:0;
-    background:rgba(0,0,0,0.9);
-    z-index:300;flex-direction:column;
-  }
-  .viewer-modal.open{display:flex;}
-  .viewer-nav{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:.8rem 1.5rem;
-    background:var(--surface);border-bottom:1px solid var(--border);
-    flex-shrink:0;
-  }
-  .viewer-title{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;}
-  .viewer-body{flex:1;display:flex;overflow:hidden;}
-  .pdf-preview{
-    flex:1;background:var(--bg);display:flex;align-items:center;justify-content:center;
-    flex-direction:column;gap:1rem;padding:2rem;
-    overflow-y:auto;
-  }
-  .pdf-page-sim{
-    width:min(700px,90%);
-    background:#fff;color:#222;
-    border-radius:4px;padding:3rem 3.5rem;
-    box-shadow:0 4px 40px rgba(0,0,0,0.5);
-    font-family:'Lora',serif;
-    min-height:500px;
-    line-height:1.8;
-    font-size:.95rem;
-  }
-  .pdf-page-sim h2{font-size:1.4rem;margin-bottom:1rem;font-family:'Syne',sans-serif;}
-  .pdf-page-sim h3{font-size:1.1rem;margin:1.5rem 0 .5rem;font-family:'Syne',sans-serif;}
-  .pdf-page-sim p{margin-bottom:1rem;}
-  .viewer-info{
-    width:300px;background:var(--surface);border-left:1px solid var(--border);
-    padding:1.5rem;overflow-y:auto;flex-shrink:0;
-  }
-  .info-section{margin-bottom:1.5rem;}
-  .info-label{font-family:'Syne',sans-serif;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
-  .info-value{font-size:.9rem;line-height:1.6;}
+  .alert { padding:10px 14px; border-radius:8px; font-size:.85rem; margin-bottom:12px; display:none; }
+  .alert.error { background:rgba(239,68,68,.15); border:1px solid rgba(239,68,68,.3); color:#fca5a5; }
+  .alert.success { background:rgba(16,185,129,.15); border:1px solid rgba(16,185,129,.3); color:#6ee7b7; }
+  .alert.info { background:rgba(0,212,255,.1); border:1px solid rgba(0,212,255,.2); color:var(--accent); }
+  .alert.show { display:block; }
 
-  /* TOAST */
-  .toast{
-    position:fixed;bottom:2rem;right:2rem;
-    padding:.8rem 1.2rem;border-radius:10px;
-    font-family:'Syne',sans-serif;font-size:.85rem;font-weight:600;
-    z-index:500;
-    transform:translateY(100px);opacity:0;
-    transition:all .3s ease;
-    display:flex;align-items:center;gap:.5rem;
-  }
-  .toast.show{transform:translateY(0);opacity:1;}
-  .toast-success{background:#1a2e23;border:1px solid rgba(91,224,179,.3);color:var(--accent3);}
-  .toast-error{background:#2e1a1a;border:1px solid rgba(224,91,91,.3);color:var(--accent2);}
-
-  /* LOADING */
-  .loading-spinner{
-    display:inline-block;width:16px;height:16px;
-    border:2px solid rgba(255,255,255,.2);
-    border-top-color:var(--accent);border-radius:50%;
-    animation:spin .7s linear infinite;
-  }
-  @keyframes spin{to{transform:rotate(360deg)}}
-
-  /* EMPTY STATE */
-  .empty-state{
-    text-align:center;padding:4rem;color:var(--muted);
-  }
-  .empty-state .empty-icon{font-size:3rem;margin-bottom:1rem;opacity:.4;}
-  .empty-state p{font-size:.9rem;line-height:1.6;}
-
-  /* ═══ BOTTOM SECTIONS ═══ */
-
-  /* VISUAL SECTION */
-  .viz-section{
-    padding:4rem 2.5rem;
+  /* ─── NAV ─── */
+  .bottom-nav {
+    position:fixed; bottom:0; left:0; right:0;
+    background:rgba(17,24,39,.95);
+    backdrop-filter:blur(16px);
     border-top:1px solid var(--border);
-    background:linear-gradient(180deg,var(--bg),var(--surface));
+    display:flex; z-index:200;
   }
-  .viz-header{text-align:center;margin-bottom:2.5rem;}
-  .viz-tag{
-    display:inline-block;font-family:'Syne',sans-serif;font-size:.72rem;
-    font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-    padding:4px 12px;border-radius:20px;margin-bottom:.8rem;
-    background:rgba(240,180,41,0.1);color:var(--accent);border:1px solid rgba(240,180,41,0.2);
+  .nav-item {
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+    padding:10px 4px 14px; cursor:pointer; border:none; background:none;
+    color:var(--muted); font-family:var(--font-body); font-size:.65rem; transition:.2s;
   }
-  .viz-title{
-    font-family:'Syne',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);
-    font-weight:800;letter-spacing:-0.03em;margin-bottom:.6rem;
-  }
-  .viz-title em{font-style:normal;background:linear-gradient(135deg,var(--accent),#ff6b35);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-  .viz-sub{color:var(--muted);font-size:.95rem;max-width:500px;margin:0 auto .8rem;line-height:1.6;font-style:italic;}
-  .btn-viz-toggle{
-    background:var(--surface2);border:1px solid var(--border);
-    color:var(--text);font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;
-    padding:10px 24px;border-radius:8px;cursor:pointer;transition:all .2s;
-    margin-top:.5rem;
-  }
-  .btn-viz-toggle:hover{background:rgba(240,180,41,0.1);border-color:rgba(240,180,41,0.3);color:var(--accent);}
-  .viz-grid{
-    display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;
-    max-width:900px;margin:0 auto;
-    animation:fadeIn .4s ease;
-  }
-  .viz-card{
-    background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.4rem;
-  }
-  .viz-card-wide{grid-column:span 2;}
-  .viz-card-title{
-    font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;
-    color:var(--muted);margin-bottom:1.2rem;text-transform:uppercase;letter-spacing:.06em;
-  }
+  .nav-item svg { width:22px; height:22px; }
+  .nav-item.active { color:var(--accent); }
+  .nav-item.active svg { filter:drop-shadow(0 0 6px var(--accent)); }
 
-  /* Bar Chart */
-  .bar-chart{display:flex;flex-direction:column;gap:8px;}
-  .bar-row{display:flex;align-items:center;gap:.6rem;}
-  .bar-label{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);width:100px;text-align:right;flex-shrink:0;}
-  .bar-track{flex:1;height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;}
-  .bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent),#ff6b35);transition:width 1s ease;}
-  .bar-count{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);width:20px;flex-shrink:0;}
+  /* ─── CONTENT ─── */
+  .content { flex:1; padding:20px 16px 90px; max-width:700px; margin:0 auto; width:100%; }
 
-  /* Donut Chart */
-  .donut-wrap{display:flex;align-items:center;gap:1.5rem;justify-content:center;}
-  .donut-legend{display:flex;flex-direction:column;gap:6px;}
-  .legend-item{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);font-family:'DM Mono',monospace;}
-  .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  /* ─── CARDS ─── */
+  .card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:20px; margin-bottom:16px;
+  }
+  .card-title { font-family:var(--font-head); font-size:1.1rem; font-weight:600; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .badge {
+    padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:700;
+    display:inline-block;
+  }
+  .badge-accent { background:rgba(0,212,255,.15); color:var(--accent); border:1px solid rgba(0,212,255,.2); }
+  .badge-green { background:rgba(16,185,129,.15); color:var(--accent3); border:1px solid rgba(16,185,129,.2); }
+  .badge-warn { background:rgba(245,158,11,.15); color:var(--warn); border:1px solid rgba(245,158,11,.2); }
+  .badge-danger { background:rgba(239,68,68,.15); color:var(--danger); border:1px solid rgba(239,68,68,.2); }
 
-  /* Spark List */
-  .spark-list{display:flex;flex-direction:column;gap:.6rem;}
-  .spark-row{display:flex;align-items:center;gap:1rem;}
-  .spark-rank{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--surface2);width:28px;text-align:center;flex-shrink:0;}
-  .spark-rank.r1{color:var(--accent);}
-  .spark-rank.r2{color:var(--muted);}
-  .spark-rank.r3{color:#cd7f32;}
-  .spark-info{flex:1;}
-  .spark-title{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:600;}
-  .spark-track{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:4px;}
-  .spark-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent3),var(--accent));transition:width 1s .2s ease;}
-  .spark-num{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);flex-shrink:0;}
+  /* ─── STAT GRID ─── */
+  .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+  .stat-box {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:14px; padding:16px; text-align:center;
+  }
+  .stat-num { font-family:var(--font-head); font-size:2rem; font-weight:700; line-height:1; }
+  .stat-lbl { font-size:.72rem; color:var(--muted); margin-top:4px; text-transform:uppercase; letter-spacing:.5px; }
 
-  /* AI TOOLS */
-  .ai-tools-section{
-    padding:4rem 2.5rem;
-    background:var(--surface);
-    border-top:1px solid var(--border);
+  /* ─── RANK DISPLAY ─── */
+  .rank-card {
+    background: linear-gradient(135deg, rgba(124,58,237,.2), rgba(0,212,255,.1));
+    border:1px solid rgba(124,58,237,.4);
+    border-radius:16px; padding:24px; text-align:center; margin-bottom:16px;
   }
-  .ai-tools-header{text-align:center;margin-bottom:2rem;}
-  .ai-tools-grid{
-    display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
-    gap:1rem;max-width:900px;margin:0 auto;
-  }
-  .ai-tool-card{
-    display:flex;align-items:center;gap:1rem;
-    padding:1rem 1.2rem;border-radius:12px;
-    text-decoration:none;
-    border:1px solid var(--border);
-    transition:all .2s;
-    position:relative;overflow:hidden;
-  }
-  .ai-tool-card::after{
-    content:'';position:absolute;inset:0;opacity:0;transition:opacity .2s;
-  }
-  .ai-tool-card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,0.3);}
-  .ai-gemini{background:linear-gradient(135deg,rgba(66,133,244,0.08),rgba(52,168,83,0.08));}
-  .ai-gemini:hover{border-color:rgba(66,133,244,0.4);}
-  .ai-notebooklm{background:linear-gradient(135deg,rgba(234,67,53,0.08),rgba(251,188,5,0.08));}
-  .ai-notebooklm:hover{border-color:rgba(234,67,53,0.4);}
-  .ai-claude{background:linear-gradient(135deg,rgba(224,119,67,0.08),rgba(240,180,41,0.08));}
-  .ai-claude:hover{border-color:rgba(240,180,41,0.4);}
-  .ai-gpt{background:linear-gradient(135deg,rgba(16,163,127,0.08),rgba(91,224,179,0.08));}
-  .ai-gpt:hover{border-color:rgba(16,163,127,0.4);}
-  .ai-tool-logo{
-    font-size:1.6rem;width:44px;height:44px;
-    display:flex;align-items:center;justify-content:center;
-    background:var(--surface2);border-radius:10px;flex-shrink:0;
-  }
-  .ai-tool-name{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;color:var(--text);}
-  .ai-tool-desc{font-size:.75rem;color:var(--muted);margin-top:2px;}
-  .ai-tool-arrow{color:var(--muted);font-size:1.1rem;margin-left:auto;transition:transform .2s;}
-  .ai-tool-card:hover .ai-tool-arrow{transform:translateX(4px);color:var(--accent);}
+  .rank-num { font-family:var(--font-head); font-size:3.5rem; font-weight:700; color:var(--accent); line-height:1; }
+  .rank-range { font-size:.85rem; color:var(--muted); margin-top:6px; }
 
-  /* LINKS SECTION */
-  .links-section{
-    padding:4rem 2.5rem;
-    background:var(--bg);
-    border-top:1px solid var(--border);
+  /* ─── EXAM LIST ─── */
+  .exam-item {
+    display:flex; align-items:center; gap:12px;
+    padding:12px 14px; background:var(--surface);
+    border:1px solid var(--border); border-radius:12px; margin-bottom:8px;
   }
-  .links-grid{
-    display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-    gap:1.2rem;max-width:960px;margin:0 auto 3rem;
-  }
-  .link-card{
-    background:var(--card);border:1px solid var(--border);border-radius:12px;
-    padding:1.2rem;transition:all .2s;
-  }
-  .link-card:hover{border-color:rgba(91,224,179,0.25);transform:translateY(-2px);}
-  .link-card-top{display:flex;align-items:center;gap:.8rem;margin-bottom:.7rem;}
-  .link-icon{font-size:1.6rem;width:42px;height:42px;background:var(--surface2);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .link-name{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;}
-  .link-url{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin-top:2px;}
-  .link-desc{font-size:.8rem;color:var(--muted);line-height:1.6;margin-bottom:.9rem;}
-  .link-btn{
-    display:inline-block;padding:7px 16px;
-    background:var(--surface2);border:1px solid var(--border);
-    color:var(--text);font-family:'Syne',sans-serif;font-size:.78rem;font-weight:600;
-    border-radius:6px;text-decoration:none;cursor:pointer;transition:all .15s;
-  }
-  .link-btn:hover{background:rgba(91,224,179,0.1);border-color:rgba(91,224,179,0.3);color:var(--accent3);}
+  .exam-score { font-family:var(--font-head); font-size:1.4rem; font-weight:700; min-width:50px; text-align:center; }
+  .exam-meta { flex:1; }
+  .exam-date { font-size:.75rem; color:var(--muted); }
+  .exam-subj { font-size:.85rem; font-weight:600; }
 
-  /* EMBED SECTION */
-  .embed-section{
-    max-width:900px;margin:0 auto;
-    background:var(--card);border:1px solid rgba(66,133,244,0.2);
-    border-radius:16px;padding:2rem;text-align:center;
+  /* ─── ROUTINE ─── */
+  .routine-slot {
+    display:flex; gap:10px; align-items:flex-start;
+    padding:10px 0; border-bottom:1px solid rgba(30,58,95,.5);
   }
-  .embed-header{margin-bottom:1rem;}
-  .embed-container{
-    border-radius:12px;overflow:hidden;
-    border:1px solid var(--border);
-    min-height:200px;
-    background:var(--surface2);
-  }
-  .embed-placeholder{
-    padding:3rem;cursor:pointer;transition:background .2s;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    min-height:200px;
-  }
-  .embed-placeholder:hover{background:rgba(66,133,244,0.05);}
-  .embed-launch-btn{
-    margin-top:1rem;padding:10px 24px;
-    background:linear-gradient(135deg,#4285f4,#34a853);
-    color:#fff;font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;
-    border-radius:8px;border:none;cursor:pointer;
-  }
-  iframe.notebooklm-frame{
-    width:100%;height:600px;border:none;display:block;
-  }
+  .slot-time { font-size:.75rem; color:var(--accent); min-width:50px; font-family:var(--font-head); }
+  .slot-act { flex:1; font-size:.9rem; }
 
-  /* FOOTER */
-  .site-footer{
-    padding:2.5rem;
-    background:var(--surface);
-    border-top:1px solid var(--border);
-    text-align:center;
-  }
-  .footer-inner{display:flex;flex-direction:column;align-items:center;gap:.3rem;}
-  .footer-link{
-    color:var(--muted);font-family:'DM Mono',monospace;font-size:.75rem;
-    text-decoration:none;transition:color .15s;
-  }
-  .footer-link:hover{color:var(--accent3);}
+  /* ─── PROGRESS ─── */
+  .prog-bar-wrap { background:rgba(0,212,255,.08); border-radius:20px; height:8px; overflow:hidden; margin:8px 0; }
+  .prog-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:20px; transition:width .6s ease; }
 
-  /* RESPONSIVE */
-  @media(max-width:768px){
-    .sidebar{display:none;}
-    .stats{gap:1.5rem;}
-    .form-row{grid-template-columns:1fr;}
-    .viewer-info{display:none;}
-    nav{padding:0 1rem;}
-    .hero{padding:3rem 1rem 2rem;}
-    .viz-grid{grid-template-columns:1fr;}
-    .viz-card-wide{grid-column:span 1;}
-    .donut-wrap{flex-direction:column;}
-    .ai-tools-section,.links-section,.viz-section{padding:2.5rem 1rem;}
-    .embed-section{padding:1.2rem;}
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,.7);
+    backdrop-filter:blur(6px); z-index:500;
+    display:none; align-items:center; justify-content:center; padding:20px;
   }
+  .modal-overlay.open { display:flex; }
+  .modal {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:20px; padding:28px; width:100%; max-width:460px;
+    animation:fadeIn .3s ease;
+  }
+  .modal-title { font-family:var(--font-head); font-size:1.3rem; font-weight:700; margin-bottom:18px; }
+  .modal-close { float:right; cursor:pointer; color:var(--muted); font-size:1.3rem; line-height:1; }
+
+  /* ─── TIMETABLE ─── */
+  .tt-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+  .tt-day { background:var(--accent); color:#000; font-weight:700; font-size:.75rem; padding:4px 10px; border-radius:6px; min-width:36px; text-align:center; }
+  .tt-subject { flex:1; font-size:.85rem; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:8px 10px; }
+
+  /* ─── REASON MODAL ─── */
+  #reason-modal .field textarea { min-height:100px; }
+
+  /* ─── SECTION HEADER ─── */
+  .sec-hdr { font-family:var(--font-head); font-size:1.4rem; font-weight:700; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
+
+  /* ─── GLOW BTN ─── */
+  .glow { box-shadow:0 0 20px rgba(0,212,255,.3); }
+
+  /* ─── SCROLLABLE LIST ─── */
+  .scroll-list { max-height:340px; overflow-y:auto; padding-right:4px; }
+  .scroll-list::-webkit-scrollbar { width:4px; }
+  .scroll-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+
+  .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.7rem; font-weight:700; margin-left:6px; }
+  .tag-absent { background:rgba(239,68,68,.2); color:var(--danger); }
+  .tag-present { background:rgba(16,185,129,.2); color:var(--accent3); }
+
+  .divider { height:1px; background:var(--border); margin:16px 0; }
+
+  .welcome-text { font-size:.9rem; color:var(--muted); }
+  .greeting { font-family:var(--font-head); font-size:1.6rem; font-weight:700; }
+
+  @media(max-width:400px) { .stat-grid { grid-template-columns:1fr 1fr; } }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <div class="logo">PDFVault <span>Free Knowledge Library</span></div>
-  <div class="nav-actions">
-    <button class="btn btn-ghost" onclick="showStats()">📊 Stats</button>
-    <button class="btn btn-accent" onclick="openUpload()">+ Upload PDF</button>
-  </div>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-glow"></div>
-  <h1>Search <em>Free PDFs.</em><br>Learn Anything.</h1>
-  <p>A community-powered library of academic papers, books, and resources — all free, no login required. AI-curated for quality.</p>
-  <div class="search-wrap">
-    <span class="search-icon">🔍</span>
-    <input class="search-input" type="text" placeholder="Search by title, author, topic, keyword…" id="searchInput" oninput="handleSearch()"/>
-  </div>
-</section>
-
-<!-- STATS -->
-<div class="stats">
-  <div class="stat"><span class="stat-num" id="totalCount">0</span><span class="stat-label">PDFs Available</span></div>
-  <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Free Access</span></div>
-  <div class="stat"><span class="stat-num" id="topicCount">0</span><span class="stat-label">Topics Covered</span></div>
-  <div class="stat"><span class="stat-num">AI</span><span class="stat-label">Quality Rated</span></div>
-</div>
-
-<!-- MAIN -->
-<div class="main">
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-title">Browse by Topic</div>
-    <div id="topicList"></div>
-  </aside>
-
-  <!-- CONTENT -->
-  <main class="content">
-    <div class="toolbar">
-      <div class="toolbar-left">Showing <strong id="resultCount">0</strong> PDFs</div>
-      <select class="sort-select" onchange="handleSort(this.value)">
-        <option value="rating">Sort: Highest Rated</option>
-        <option value="newest">Sort: Newest</option>
-        <option value="downloads">Sort: Most Downloaded</option>
-        <option value="pages">Sort: Fewest Pages</option>
-      </select>
-    </div>
-    <div class="pdf-grid" id="pdfGrid"></div>
-    <div class="empty-state" id="emptyState" style="display:none;">
-      <div class="empty-icon">📭</div>
-      <p>No PDFs match your search.<br>Try a different keyword or topic.</p>
-    </div>
-  </main>
-</div>
-
-<!-- UPLOAD MODAL -->
-<div class="modal-overlay" id="uploadModal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">📤 Upload a PDF</div>
-      <button class="close-btn" onclick="closeUpload()">✕</button>
-    </div>
-    
-    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      <div class="drop-icon">📄</div>
-      <div class="drop-text"><strong>Click to choose</strong> or drag & drop your PDF here</div>
-      <div class="drop-text" style="font-size:.75rem;margin-top:.3rem;">Max 50MB · PDF only</div>
-      <input type="file" id="fileInput" accept=".pdf" style="display:none" onchange="handleFile(this)"/>
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Title *</label>
-        <input class="form-input" id="uploadTitle" placeholder="Document title"/>
+<!-- ══════════════════ AUTH SCREEN ══════════════════ -->
+<div class="screen active" id="screen-auth">
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <div class="auth-title">Sripa <span style="color:var(--accent2)">EAPCET</span></div>
+      <div class="auth-sub">AP EAPCET Preparation Monitoring System</div>
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="authTab('login')">Login</button>
+        <button class="tab-btn" onclick="authTab('register')">Register</button>
       </div>
-      <div class="form-group">
-        <label class="form-label">Author</label>
-        <input class="form-input" id="uploadAuthor" placeholder="Author name(s)"/>
+      <div class="alert" id="auth-alert"></div>
+
+      <!-- LOGIN -->
+      <div id="auth-login">
+        <div class="field"><label>Gmail ID</label><input type="email" id="l-email" placeholder="student@gmail.com"></div>
+        <div class="field"><label>Password</label><input type="password" id="l-pass" placeholder="••••••••"></div>
+        <button class="btn btn-primary glow" onclick="doLogin()">🚀 Login</button>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="auth-register" style="display:none">
+        <div class="field"><label>Full Name</label><input type="text" id="r-name" placeholder="Your full name"></div>
+        <div class="field"><label>Gmail ID</label><input type="email" id="r-email" placeholder="student@gmail.com"></div>
+        <div class="field"><label>Password</label><input type="password" id="r-pass" placeholder="Min 6 characters"></div>
+        <div class="divider"></div>
+        <div style="font-size:.8rem;color:var(--accent);margin-bottom:12px;font-weight:600;">👨‍👩‍👦 Guardian Details</div>
+        <div class="field"><label>Guardian Name</label><input type="text" id="r-gname" placeholder="Parent / Guardian name"></div>
+        <div class="field"><label>Guardian Gmail</label><input type="email" id="r-gemail" placeholder="guardian@gmail.com"></div>
+        <div class="field">
+          <label>Verify Guardian Gmail</label>
+          <div class="otp-row">
+            <input type="text" id="r-otp" placeholder="Enter OTP" maxlength="6">
+            <button class="btn btn-secondary" onclick="sendOTP()">Send OTP</button>
+          </div>
+        </div>
+        <button class="btn btn-primary glow" onclick="doRegister()" style="margin-top:4px">✅ Create Account</button>
       </div>
     </div>
+  </div>
+</div>
 
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Topic *</label>
-        <select class="form-select" id="uploadTopic">
-          <option value="">Select topic…</option>
-          <option>Mathematics</option>
-          <option>Physics</option>
-          <option>Computer Science</option>
-          <option>Biology</option>
-          <option>Chemistry</option>
-          <option>History</option>
-          <option>Philosophy</option>
-          <option>Economics</option>
-          <option>Psychology</option>
-          <option>Engineering</option>
-          <option>Literature</option>
-          <option>Medicine</option>
-          <option>Law</option>
-          <option>Other</option>
+<!-- ══════════════════ MAIN APP ══════════════════ -->
+<div class="screen" id="screen-app">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo">Sripa EAPCET</div>
+    <div class="user-chip" onclick="showLogout()">
+      <div class="avatar" id="avatar-init">S</div>
+      <span id="topbar-name">Student</span>
+      <span style="font-size:.7rem;color:var(--muted)">▾</span>
+    </div>
+  </div>
+
+  <!-- TAB PANELS -->
+  <div class="content" id="tab-home" style="display:block">
+    <div class="greeting">Good <span id="greeting-time">Morning</span> ☀️</div>
+    <div class="welcome-text" id="welcome-name" style="margin-bottom:20px"></div>
+
+    <!-- Today Progress -->
+    <div class="card">
+      <div class="card-title">📅 Today's Progress</div>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-num" id="today-exams" style="color:var(--accent)">0</div>
+          <div class="stat-lbl">Exams Done</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="today-avg" style="color:var(--accent3)">—</div>
+          <div class="stat-lbl">Avg Score</div>
+        </div>
+      </div>
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:6px">Target: 2 Exams / Day</div>
+      <div class="prog-bar-wrap"><div class="prog-bar" id="today-prog" style="width:0%"></div></div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" onclick="openExamModal()">📝 Log Exam</button>
+        <button class="btn btn-secondary btn-sm" onclick="openRoutineModal()">📋 Log Routine</button>
+        <button class="btn btn-warn btn-sm" style="width:auto" onclick="markAbsent()">⚠️ Mark Absent</button>
+      </div>
+    </div>
+
+    <!-- Latest Rank Prediction -->
+    <div class="rank-card" id="rank-preview">
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:4px">PREDICTED AP EAPCET RANK</div>
+      <div class="rank-num" id="rank-display">—</div>
+      <div class="rank-range" id="rank-range">Enter exam marks to get prediction</div>
+    </div>
+
+    <!-- Reminder Status -->
+    <div class="card">
+      <div class="card-title">🔔 Reminders</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.9rem">Morning Reminder (9:00 AM)</span>
+          <span class="badge badge-green">Active</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.9rem">Evening Check (9:00 PM)</span>
+          <span class="badge badge-green">Active</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.9rem">Guardian Report (10:00 PM)</span>
+          <span class="badge badge-accent">Scheduled</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="requestNotifPerms()" style="margin-top:4px">Enable Browser Notifications</button>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="card">
+      <div class="card-title">📊 All-Time Stats</div>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-num" id="total-exams" style="color:var(--accent2)">0</div>
+          <div class="stat-lbl">Total Exams</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="best-score" style="color:var(--warn)">0</div>
+          <div class="stat-lbl">Best Score</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="absent-count" style="color:var(--danger)">0</div>
+          <div class="stat-lbl">Absent Days</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="streak-count" style="color:var(--accent3)">0</div>
+          <div class="stat-lbl">Day Streak</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content" id="tab-exams" style="display:none">
+    <div class="sec-hdr">📝 Exam Results <span class="badge badge-accent" id="exam-count-badge">0</span></div>
+    <div class="card">
+      <button class="btn btn-primary btn-sm" onclick="openExamModal()" style="margin-bottom:12px">+ Add Exam Result</button>
+      <div class="scroll-list" id="exam-list-container">
+        <div style="text-align:center;color:var(--muted);padding:30px">No exams recorded yet.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content" id="tab-routine" style="display:none">
+    <div class="sec-hdr">🗓️ Routine & Timetable</div>
+
+    <!-- Timetable -->
+    <div class="card">
+      <div class="card-title">📅 Weekly Timetable</div>
+      <div id="tt-list"></div>
+      <button class="btn btn-secondary btn-sm" onclick="openTimetableModal()" style="margin-top:4px">✏️ Edit Timetable</button>
+    </div>
+
+    <!-- Day Routines -->
+    <div class="card">
+      <div class="card-title">📋 Daily Activity Log</div>
+      <div class="scroll-list" id="routine-log-list">
+        <div style="text-align:center;color:var(--muted);padding:20px">No routines logged.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content" id="tab-reports" style="display:none">
+    <div class="sec-hdr">📈 Reports & Rank Tracker</div>
+
+    <!-- Manual Rank Check -->
+    <div class="card">
+      <div class="card-title">🎯 AP EAPCET Rank Predictor</div>
+      <div style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Enter your practice test score (out of 160) to predict your rank based on previous years' AP EAPCET data.</div>
+      <div class="field"><label>Your Score (out of 160)</label><input type="number" id="pred-score" placeholder="e.g. 112" min="0" max="160"></div>
+      <div class="field"><label>Stream</label>
+        <select id="pred-stream">
+          <option value="MPC">MPC (Maths, Physics, Chemistry)</option>
+          <option value="BiPC">BiPC (Biology, Physics, Chemistry)</option>
         </select>
       </div>
-      <div class="form-group">
-        <label class="form-label">Year Published</label>
-        <input class="form-input" id="uploadYear" type="number" placeholder="e.g. 2023" min="1900" max="2025"/>
+      <button class="btn btn-primary" onclick="predictRank()">🔮 Predict My Rank</button>
+      <div class="rank-card" id="pred-result" style="display:none;margin-top:16px">
+        <div style="font-size:.8rem;color:var(--muted);margin-bottom:4px">PREDICTED RANK</div>
+        <div class="rank-num" id="pred-rank-num">—</div>
+        <div class="rank-range" id="pred-rank-range"></div>
+        <div id="pred-college-hint" style="font-size:.8rem;color:var(--accent3);margin-top:8px"></div>
       </div>
     </div>
 
-    <div class="form-group">
-      <label class="form-label">Brief Description</label>
-      <textarea class="form-textarea" id="uploadDesc" placeholder="What is this document about?"></textarea>
+    <!-- Rank History Chart (text-based) -->
+    <div class="card">
+      <div class="card-title">📉 Score History</div>
+      <div id="score-history-list">
+        <div style="text-align:center;color:var(--muted);padding:20px">No history yet.</div>
+      </div>
     </div>
 
-    <button class="btn btn-accent" style="width:100%;padding:12px;font-size:.9rem;" id="analyzeBtn" onclick="runAIAnalysis()">
-      🤖 Analyze with AI & Submit
+    <!-- Reasons Log -->
+    <div class="card">
+      <div class="card-title">📝 Missed Day Reasons</div>
+      <div class="scroll-list" id="reasons-list">
+        <div style="text-align:center;color:var(--muted);padding:20px">No missed day reasons.</div>
+      </div>
+    </div>
+
+    <!-- Send Report -->
+    <div class="card">
+      <div class="card-title">📧 Send Report to Guardian</div>
+      <button class="btn btn-green" onclick="sendGuardianReport()">📨 Send Today's Report Now</button>
+      <div class="alert" id="mail-alert" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('home',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Home
     </button>
+    <button class="nav-item" onclick="switchTab('exams',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
+      Exams
+    </button>
+    <button class="nav-item" onclick="switchTab('routine',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+      Routine
+    </button>
+    <button class="nav-item" onclick="switchTab('reports',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+      Reports
+    </button>
+  </div>
+</div>
 
-    <!-- AI ANALYSIS PANEL -->
-    <div class="ai-panel" id="aiPanel">
-      <div class="ai-panel-header">
-        <div class="ai-dot"></div>
-        <span>AI Quality Analysis</span>
-      </div>
-      <div class="ai-result" id="aiResult"></div>
+<!-- ══════ MODALS ══════ -->
+
+<!-- LOG EXAM MODAL -->
+<div class="modal-overlay" id="exam-modal">
+  <div class="modal">
+    <span class="modal-close" onclick="closeModal('exam-modal')">✕</span>
+    <div class="modal-title">📝 Log Exam</div>
+    <div class="field"><label>Score (out of 160)</label><input type="number" id="ex-score" placeholder="e.g. 118" min="0" max="160"></div>
+    <div class="field"><label>Subject / Test Name</label><input type="text" id="ex-name" placeholder="e.g. Full Mock Test 1 / Physics"></div>
+    <div class="field"><label>Date & Time</label><input type="datetime-local" id="ex-datetime"></div>
+    <div class="field"><label>Stream</label>
+      <select id="ex-stream"><option value="MPC">MPC</option><option value="BiPC">BiPC</option></select>
+    </div>
+    <div class="field"><label>Notes (optional)</label><input type="text" id="ex-notes" placeholder="Weak areas, remarks..."></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-primary" onclick="saveExam()">✅ Save Exam</button>
+      <button class="btn btn-secondary" onclick="closeModal('exam-modal')">Cancel</button>
     </div>
   </div>
 </div>
 
-<!-- PDF VIEWER MODAL -->
-<div class="viewer-modal" id="viewerModal">
-  <div class="viewer-nav">
-    <div style="display:flex;align-items:center;gap:1rem;">
-      <button class="btn btn-ghost" onclick="closeViewer()" style="padding:6px 12px;">← Back</button>
-      <div class="viewer-title" id="viewerTitle">Document Title</div>
-    </div>
-    <div style="display:flex;gap:8px;">
-      <button class="btn btn-ghost" onclick="downloadPdf()" style="padding:6px 12px;">⬇ Download</button>
-      <div class="rating-badge rating-high" id="viewerRating">⭐ 9.2</div>
-    </div>
-  </div>
-  <div class="viewer-body">
-    <div class="pdf-preview" id="pdfPreview"></div>
-    <div class="viewer-info">
-      <div class="info-section">
-        <div class="info-label">About This Document</div>
-        <div class="info-value" id="viewerDesc"></div>
-      </div>
-      <div class="info-section">
-        <div class="info-label">Topic</div>
-        <div class="info-value" id="viewerTopic"></div>
-      </div>
-      <div class="info-section">
-        <div class="info-label">Author</div>
-        <div class="info-value" id="viewerAuthor"></div>
-      </div>
-      <div class="info-section">
-        <div class="info-label">AI Analysis</div>
-        <div class="info-value" id="viewerAnalysis"></div>
-      </div>
-      <div class="info-section">
-        <div class="info-label">Quality Score</div>
-        <div id="viewerScore"></div>
-      </div>
+<!-- LOG ROUTINE MODAL -->
+<div class="modal-overlay" id="routine-modal">
+  <div class="modal">
+    <span class="modal-close" onclick="closeModal('routine-modal')">✕</span>
+    <div class="modal-title">📋 Log Today's Routine</div>
+    <div class="field"><label>Time</label><input type="time" id="rt-time"></div>
+    <div class="field"><label>Activity</label><input type="text" id="rt-act" placeholder="e.g. Studied Maths Integrals, Lunch, Exercise"></div>
+    <div class="field"><label>Duration (minutes)</label><input type="number" id="rt-dur" placeholder="e.g. 60"></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-primary" onclick="saveRoutine()">✅ Add Activity</button>
+      <button class="btn btn-secondary" onclick="closeModal('routine-modal')">Cancel</button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<!-- ═══ BOTTOM SECTIONS ═══ -->
-
-<!-- VISUAL REPRESENTATION SECTION -->
-<section class="viz-section" id="vizSection">
-  <div class="viz-header">
-    <div class="viz-tag">📊 Library Analytics</div>
-    <h2 class="viz-title">Want to try <em>Visual Representation?</em></h2>
-    <p class="viz-sub">Explore the library through charts, topic breakdowns, and rating distributions.</p>
-    <button class="btn-viz-toggle" id="vizToggleBtn" onclick="toggleViz()">
-      <span>▶ Show Visualizations</span>
-    </button>
+<!-- TIMETABLE MODAL -->
+<div class="modal-overlay" id="tt-modal">
+  <div class="modal">
+    <span class="modal-close" onclick="closeModal('tt-modal')">✕</span>
+    <div class="modal-title">📅 Edit Weekly Timetable</div>
+    <div id="tt-inputs"></div>
+    <button class="btn btn-primary" onclick="saveTimetable()" style="margin-top:12px">✅ Save Timetable</button>
   </div>
+</div>
 
-  <div class="viz-grid" id="vizGrid" style="display:none;">
-    <!-- Bar Chart: PDFs per Topic -->
-    <div class="viz-card">
-      <div class="viz-card-title">📚 PDFs by Topic</div>
-      <div class="bar-chart" id="barChart"></div>
-    </div>
-
-    <!-- Rating Distribution -->
-    <div class="viz-card">
-      <div class="viz-card-title">⭐ Rating Distribution</div>
-      <div class="donut-wrap">
-        <canvas id="donutChart" width="200" height="200"></canvas>
-        <div class="donut-legend" id="donutLegend"></div>
-      </div>
-    </div>
-
-    <!-- Downloads Sparkline -->
-    <div class="viz-card viz-card-wide">
-      <div class="viz-card-title">⬇ Top 5 Most Downloaded</div>
-      <div class="spark-list" id="sparkList"></div>
+<!-- REASON MODAL -->
+<div class="modal-overlay" id="reason-modal">
+  <div class="modal">
+    <span class="modal-close" onclick="closeModal('reason-modal')">✕</span>
+    <div class="modal-title">⚠️ Why couldn't you complete 2 exams today?</div>
+    <div class="field"><label>Your Reason</label><textarea id="reason-text" placeholder="Be honest, your guardian will see this..."></textarea></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-warn" onclick="saveReason()">📨 Submit Reason</button>
+      <button class="btn btn-secondary" onclick="closeModal('reason-modal')">Skip</button>
     </div>
   </div>
-</section>
+</div>
 
-<!-- AI TOOLS BANNER -->
-<section class="ai-tools-section">
-  <div class="ai-tools-header">
-    <div class="viz-tag" style="background:rgba(138,43,226,0.15);color:#bf7fff;border-color:rgba(138,43,226,0.25);">🤖 AI-Powered Reading</div>
-    <h2 class="viz-title">Supercharge your reading with <em style="background:linear-gradient(135deg,#bf7fff,#5be0b3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">AI Tools</em></h2>
-    <p class="viz-sub">Open any PDF directly in these AI assistants for instant summaries, Q&A, and deep analysis.</p>
-  </div>
-  <div class="ai-tools-grid">
-    <a href="https://gemini.google.com" target="_blank" class="ai-tool-card ai-gemini">
-      <div class="ai-tool-logo">✦</div>
-      <div class="ai-tool-info">
-        <div class="ai-tool-name">Google Gemini</div>
-        <div class="ai-tool-desc">Upload a PDF and ask anything</div>
-      </div>
-      <div class="ai-tool-arrow">→</div>
-    </a>
-    <a href="https://notebooklm.google.com" target="_blank" class="ai-tool-card ai-notebooklm">
-      <div class="ai-tool-logo">📓</div>
-      <div class="ai-tool-info">
-        <div class="ai-tool-name">Google NotebookLM</div>
-        <div class="ai-tool-desc">Create AI notebooks from PDFs</div>
-      </div>
-      <div class="ai-tool-arrow">→</div>
-    </a>
-    <a href="https://claude.ai" target="_blank" class="ai-tool-card ai-claude">
-      <div class="ai-tool-logo">◆</div>
-      <div class="ai-tool-info">
-        <div class="ai-tool-name">Claude by Anthropic</div>
-        <div class="ai-tool-desc">Deep document analysis & Q&A</div>
-      </div>
-      <div class="ai-tool-arrow">→</div>
-    </a>
-    <a href="https://chatgpt.com" target="_blank" class="ai-tool-card ai-gpt">
-      <div class="ai-tool-logo">◉</div>
-      <div class="ai-tool-info">
-        <div class="ai-tool-name">ChatGPT</div>
-        <div class="ai-tool-desc">Summarize & explain any PDF</div>
-      </div>
-      <div class="ai-tool-arrow">→</div>
-    </a>
-  </div>
-</section>
-
-<!-- FREE LIBRARY LINKS SECTION -->
-<section class="links-section">
-  <div class="ai-tools-header">
-    <div class="viz-tag" style="background:rgba(91,224,179,0.1);color:var(--accent3);border-color:rgba(91,224,179,0.2);">🌐 External Libraries</div>
-    <h2 class="viz-title">More <em style="background:linear-gradient(135deg,var(--accent3),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Free Resources</em></h2>
-    <p class="viz-sub">Trusted open-access repositories with millions of free academic papers, books, and documents.</p>
-  </div>
-  <div class="links-grid">
-
-    <div class="link-card">
-      <div class="link-card-top">
-        <div class="link-icon">🏛️</div>
-        <div>
-          <div class="link-name">National Digital Library of India</div>
-          <div class="link-url">ndl.iitkgp.ac.in</div>
-        </div>
-      </div>
-      <p class="link-desc">India's largest digital repository — millions of books, theses, and research papers across all disciplines.</p>
-      <a href="https://ndl.iitkgp.ac.in" target="_blank" class="link-btn">Open NDL →</a>
-    </div>
-
-    <div class="link-card">
-      <div class="link-card-top">
-        <div class="link-icon">🔬</div>
-        <div>
-          <div class="link-name">arXiv</div>
-          <div class="link-url">arxiv.org</div>
-        </div>
-      </div>
-      <p class="link-desc">2M+ preprints in physics, math, CS, economics, biology — free and open access, updated daily.</p>
-      <a href="https://arxiv.org" target="_blank" class="link-btn">Open arXiv →</a>
-    </div>
-
-    <div class="link-card">
-      <div class="link-card-top">
-        <div class="link-icon">📗</div>
-        <div>
-          <div class="link-name">Open Library</div>
-          <div class="link-url">openlibrary.org</div>
-        </div>
-      </div>
-      <p class="link-desc">Internet Archive's book library — borrow and read millions of books online for free, no fee.</p>
-      <a href="https://openlibrary.org" target="_blank" class="link-btn">Open Library →</a>
-    </div>
-
-    <div class="link-card">
-      <div class="link-card-top">
-        <div class="link-icon">🎓</div>
-        <div>
-          <div class="link-name">DOAJ</div>
-          <div class="link-url">doaj.org</div>
-        </div>
-      </div>
-      <p class="link-desc">Directory of Open Access Journals — peer-reviewed, free-to-read scientific and scholarly research.</p>
-      <a href="https://doaj.org" target="_blank" class="link-btn">Open DOAJ →</a>
-    </div>
-
-    <div class="link-card">
-      <div class="link-card-top">
-        <div class="link-icon">🧪</div>
-        <div>
-          <div class="link-name">PubMed Central</div>
-          <div class="link-url">ncbi.nlm.nih.gov/pmc</div>
-        </div>
-      </div>
-      <p class="link-desc">NIH's free full-text archive of biomedical and life sciences journal literature — millions of articles.</p>
-      <a href="https://www.ncbi.nlm.nih.gov/pmc/" target="_blank" class="link-btn">Open PMC →</a>
-    </div>
-
-    <div class="link-card">
-      <div class="link-card-top">
-        <div class="link-icon">🌍</div>
-        <div>
-          <div class="link-name">Project Gutenberg</div>
-          <div class="link-url">gutenberg.org</div>
-        </div>
-      </div>
-      <p class="link-desc">70,000+ free eBooks — classic literature, historical texts, and public domain works in multiple formats.</p>
-      <a href="https://www.gutenberg.org" target="_blank" class="link-btn">Open Gutenberg →</a>
-    </div>
-
-  </div>
-
-  <!-- EMBEDDED NOTEBOOKLM PREVIEW -->
-  <div class="embed-section">
-    <div class="embed-header">
-      <div class="viz-tag" style="background:rgba(66,133,244,0.1);color:#7ab4f5;border-color:rgba(66,133,244,0.2);">🔗 Embedded Tool</div>
-      <h3 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin:.5rem 0;">Try Google NotebookLM — right here</h3>
-      <p style="color:var(--muted);font-size:.9rem;margin-bottom:1.2rem;">Click below to open NotebookLM in an embedded panel. Upload any PDF and start chatting with it instantly.</p>
-    </div>
-    <div class="embed-container" id="embedContainer">
-      <div class="embed-placeholder" id="embedPlaceholder" onclick="loadEmbed()">
-        <div style="font-size:3rem;margin-bottom:.8rem;">📓</div>
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:.4rem;">Click to open NotebookLM</div>
-        <div style="font-size:.85rem;color:var(--muted);">Opens in embedded panel — no new tab needed</div>
-        <div class="embed-launch-btn">▶ Launch NotebookLM</div>
-      </div>
-    </div>
-    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1rem;">
-      <a href="https://notebooklm.google.com" target="_blank" class="link-btn" style="display:inline-block;">🔗 Open in new tab</a>
-      <a href="https://arxiv.org" target="_blank" class="link-btn" style="display:inline-block;">🔬 Find a paper on arXiv</a>
-      <a href="https://ndl.iitkgp.ac.in" target="_blank" class="link-btn" style="display:inline-block;">🏛️ Browse NDL India</a>
+<!-- LOGOUT CONFIRM -->
+<div class="modal-overlay" id="logout-modal">
+  <div class="modal">
+    <div class="modal-title">👋 Logout?</div>
+    <p style="color:var(--muted);margin-bottom:18px;font-size:.9rem">Are you sure you want to logout?</p>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-danger" onclick="doLogout()">Logout</button>
+      <button class="btn btn-secondary" onclick="closeModal('logout-modal')">Cancel</button>
     </div>
   </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="site-footer">
-  <div class="footer-inner">
-    <div class="logo" style="margin-bottom:.5rem;">PDFVault</div>
-    <p style="font-size:.8rem;color:var(--muted);max-width:400px;text-align:center;line-height:1.6;">Free knowledge for everyone. No login, no fees, no limits. Built with ♥ for learners worldwide.</p>
-    <div style="display:flex;gap:1.5rem;margin-top:1rem;flex-wrap:wrap;justify-content:center;">
-      <a href="https://arxiv.org" target="_blank" class="footer-link">arXiv</a>
-      <a href="https://ndl.iitkgp.ac.in" target="_blank" class="footer-link">NDL India</a>
-      <a href="https://openlibrary.org" target="_blank" class="footer-link">Open Library</a>
-      <a href="https://doaj.org" target="_blank" class="footer-link">DOAJ</a>
-      <a href="https://www.ncbi.nlm.nih.gov/pmc/" target="_blank" class="footer-link">PubMed</a>
-      <a href="https://www.gutenberg.org" target="_blank" class="footer-link">Gutenberg</a>
-    </div>
-  </div>
-</footer>
+</div>
 
 <script>
-// ═══════════════════════════════
-// DATA
-// ═══════════════════════════════
-const TOPICS = [
-  {id:'all',name:'All PDFs',icon:'📚'},
-  {id:'Computer Science',name:'Computer Science',icon:'💻'},
-  {id:'Mathematics',name:'Mathematics',icon:'📐'},
-  {id:'Physics',name:'Physics',icon:'⚛️'},
-  {id:'Biology',name:'Biology',icon:'🧬'},
-  {id:'Chemistry',name:'Chemistry',icon:'🧪'},
-  {id:'History',name:'History',icon:'🏛️'},
-  {id:'Philosophy',name:'Philosophy',icon:'🦉'},
-  {id:'Economics',name:'Economics',icon:'📈'},
-  {id:'Psychology',name:'Psychology',icon:'🧠'},
-  {id:'Engineering',name:'Engineering',icon:'⚙️'},
-  {id:'Literature',name:'Literature',icon:'📖'},
-  {id:'Medicine',name:'Medicine',icon:'🏥'},
-  {id:'Law',name:'Law',icon:'⚖️'},
-];
+// ══════════════════════════════════════════════
+// EMAILJS CONFIG — fill these after signing up at emailjs.com (FREE)
+// ══════════════════════════════════════════════
+const EMAILJS_PUBLIC_KEY = "YOUR_EMAILJS_PUBLIC_KEY";
+const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
+const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+// ══════════════════════════════════════════════
 
-const SEED_PDFS = [
-  {id:1,title:'Introduction to Machine Learning',author:'Dr. Sarah Chen',topic:'Computer Science',year:2022,pages:340,rating:9.4,downloads:12840,desc:'A comprehensive introduction covering supervised and unsupervised learning, neural networks, and practical applications with Python.',analysis:'Excellent structure and depth. Covers fundamentals rigorously with good balance of theory and code examples. Highly recommended for beginners and intermediate learners.',content:`<h2>Introduction to Machine Learning</h2><p>Machine learning is a branch of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed.</p><h3>Chapter 1: Supervised Learning</h3><p>In supervised learning, we train models on labeled data. The algorithm learns a mapping from input features to output labels. Common algorithms include Linear Regression, Decision Trees, and Support Vector Machines.</p><p>The key challenge is generalization — building models that perform well not just on training data but on new, unseen examples. This requires techniques like cross-validation and regularization.</p><h3>Chapter 2: Neural Networks</h3><p>Artificial neural networks are computing systems loosely modeled after biological neural networks. They consist of interconnected nodes (neurons) organized in layers that process information using connectionist approaches to computation.</p><p>Deep learning uses multiple hidden layers to learn increasingly abstract representations of the data. This has led to breakthroughs in computer vision, natural language processing, and reinforcement learning.</p>`},
-  {id:2,title:'Quantum Mechanics: A Modern Perspective',author:'Prof. James Bohr',topic:'Physics',year:2021,pages:420,rating:9.1,downloads:8320,desc:'From wave functions to quantum field theory, this text bridges classical and modern physics with clear derivations.',analysis:'Rigorous mathematical treatment with excellent physical intuition. Strong on interpretations and applications. Minor gaps in quantum computing coverage.',content:`<h2>Quantum Mechanics: A Modern Perspective</h2><p>Quantum mechanics is the foundational theory of modern physics, governing the behavior of matter and energy at atomic and subatomic scales.</p><h3>The Wave Function</h3><p>The state of a quantum system is described by a wave function ψ(x,t), which contains all physical information about the system. The probability density of finding the particle at position x at time t is given by |ψ(x,t)|².</p><h3>The Schrödinger Equation</h3><p>The time-dependent Schrödinger equation governs the evolution of quantum states: iℏ ∂ψ/∂t = Ĥψ, where Ĥ is the Hamiltonian operator representing the total energy of the system.</p><p>This equation is linear, meaning superposition applies — a fundamental distinction from classical mechanics that leads to quantum interference and entanglement.</p>`},
-  {id:3,title:'Calculus and Its Applications',author:'Maria Santos',topic:'Mathematics',year:2020,pages:280,rating:8.7,downloads:19500,desc:'Clear, example-rich treatment of single and multivariable calculus for science and engineering students.',analysis:'Well-organized with abundant exercises. Explanations are accessible without sacrificing rigor. Good coverage of applications to real-world problems.',content:`<h2>Calculus and Its Applications</h2><p>Calculus is the mathematical study of continuous change. It has two major branches: differential calculus concerning rates of change, and integral calculus concerning accumulation of quantities.</p><h3>Limits and Continuity</h3><p>The concept of a limit is foundational to calculus. We say lim(x→a) f(x) = L if f(x) approaches L as x approaches a. This seemingly simple idea unlocks the entire theory of derivatives and integrals.</p><h3>The Derivative</h3><p>The derivative f'(x) measures the instantaneous rate of change of f at x. Geometrically, it is the slope of the tangent line to the graph at that point. Applications range from optimization to physics to economics.</p>`},
-  {id:4,title:'The Origins of Species',author:'Charles Darwin',topic:'Biology',year:1859,pages:502,rating:9.9,downloads:34200,desc:'The seminal work on natural selection and evolutionary theory that transformed our understanding of life on Earth.',analysis:'A landmark scientific text. Original prose is remarkably clear for its era. Essential reading for understanding the history and foundation of evolutionary biology.',content:`<h2>On the Origin of Species</h2><p>When on board H.M.S. Beagle, as naturalist, I was much struck with certain facts in the distribution of the inhabitants of South America, and in the geological relations of the present to the past inhabitants of that continent.</p><h3>Natural Selection</h3><p>How will the struggle for existence act in regard to variation? Can the principle of selection, which we have seen is so potent in the hands of man, apply in nature? I think we shall see that it can act most effectually.</p><p>If variations useful to any organic being do occur, assuredly individuals thus characterised will have the best chance of being preserved in the struggle for life; and from the strong principle of inheritance they will tend to produce offspring similarly characterised.</p>`},
-  {id:5,title:'Principles of Economics',author:'N. Gregory Mankiw',topic:'Economics',year:2021,pages:858,rating:8.9,downloads:22100,desc:'The best-selling economics textbook, covering microeconomics, macroeconomics, and international trade.',analysis:'Comprehensive and well-structured. Excellent use of real-world examples and case studies. Some chapters could be updated for post-pandemic economic realities.',content:`<h2>Principles of Economics</h2><p>Economics is the study of how society manages its scarce resources. In most societies, resources are allocated not by a central planner but through the combined actions of millions of households and firms.</p><h3>The Ten Principles</h3><p>People face trade-offs. The cost of something is what you give up to get it. Rational people think at the margin. People respond to incentives. Trade can make everyone better off. Markets are usually a good way to organize economic activity.</p><h3>Supply and Demand</h3><p>The tools of supply and demand allow us to analyze how events affect markets. The quantity demanded of any good is the amount that buyers are willing and able to purchase at a given price.</p>`},
-  {id:6,title:'The Human Brain: Structure and Function',author:'Dr. Rita Patel',topic:'Medicine',year:2023,pages:390,rating:9.3,downloads:7600,desc:'Modern neuroscience from anatomy to cognition, including neuroplasticity, disorders, and emerging therapies.',analysis:'Outstanding clarity and up-to-date content. Excellent diagrams and case studies. Strong coverage of neurological disorders and treatment approaches.',content:`<h2>The Human Brain</h2><p>The human brain is the most complex structure known in the universe. It contains approximately 86 billion neurons, each forming thousands of synaptic connections with other cells.</p><h3>Cerebral Cortex</h3><p>The cerebral cortex is the outermost layer of the brain and is responsible for higher-order functions including cognition, language, memory, and consciousness. It is divided into four lobes: frontal, parietal, temporal, and occipital.</p><h3>Neuroplasticity</h3><p>The brain is not a static organ. Through a process called neuroplasticity, it continually reorganizes itself by forming new neural connections throughout life. This capacity underlies learning, memory, and recovery from injury.</p>`},
-  {id:7,title:'A History of the Ancient World',author:'Susan Wise Bauer',topic:'History',year:2018,pages:896,rating:8.5,downloads:9800,desc:'From early Sumer and Egypt through the fall of Rome, a narrative history of the ancient world.',analysis:'Engaging narrative with strong sourcing. Covers underrepresented civilizations well. Dense but rewarding. Good bibliography for further research.',content:`<h2>A History of the Ancient World</h2><p>History begins where literacy begins. The first written records appear in Sumer around 3200 BC — not as literature or religion, but as accounting records. The need to keep track of grain, sheep, and trade created writing.</p><h3>The Rise of Egypt</h3><p>Along the Nile, a civilization was coalescing that would last, in recognizable form, for three thousand years. The unification of Upper and Lower Egypt under the first pharaohs around 3100 BC created one of history's most enduring political structures.</p>`},
-  {id:8,title:'Cognitive Psychology',author:'Prof. Alan Baddeley',topic:'Psychology',year:2022,pages:456,rating:8.8,downloads:14300,desc:'Memory, attention, language, and decision-making explored through landmark experiments and modern cognitive science.',analysis:'Excellent balance of classic research and contemporary findings. Clear writing with strong pedagogical structure. Recommended for both students and practitioners.',content:`<h2>Cognitive Psychology</h2><p>Cognitive psychology is the scientific study of mental processes such as attention, language use, memory, perception, problem solving, creativity, and reasoning.</p><h3>Models of Memory</h3><p>Atkinson and Shiffrin's modal model proposed three distinct memory stores: sensory register, short-term memory, and long-term memory. Information flows sequentially through these stores, with rehearsal serving as the key process for transfer to long-term storage.</p><h3>Working Memory</h3><p>Baddeley and Hitch replaced the concept of short-term memory with the more complex working memory model, comprising a central executive, phonological loop, visuospatial sketchpad, and episodic buffer.</p>`},
-];
+// ─── STATE ───
+let currentUser = null;
+let otpSent = null;
 
-// ═══════════════════════════════
-// STATE
-// ═══════════════════════════════
-let pdfs = [...SEED_PDFS];
-let currentTopic = 'all';
-let currentSort = 'rating';
-let searchQuery = '';
-let selectedFile = null;
-let currentPdf = null;
+// ─── INIT ───
+window.onload = () => {
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+  const saved = localStorage.getItem('sripa_user');
+  if (saved) {
+    currentUser = JSON.parse(saved);
+    enterApp();
+  }
+  setGreeting();
+  scheduleDailyChecks();
+};
 
-// ═══════════════════════════════
-// INIT
-// ═══════════════════════════════
-function init() {
-  renderTopics();
-  renderPdfs();
-  updateStats();
-  setupDragDrop();
+function setGreeting() {
+  const h = new Date().getHours();
+  const t = h < 12 ? 'Morning' : h < 17 ? 'Afternoon' : 'Evening';
+  const el = document.getElementById('greeting-time');
+  if (el) el.textContent = t;
 }
 
-// ═══════════════════════════════
-// TOPICS SIDEBAR
-// ═══════════════════════════════
-function renderTopics() {
-  const list = document.getElementById('topicList');
-  list.innerHTML = TOPICS.map(t => {
-    const count = t.id === 'all' ? pdfs.length : pdfs.filter(p=>p.topic===t.id).length;
-    return `<button class="topic-btn ${currentTopic===t.id?'active':''}" onclick="setTopic('${t.id}')">
-      <span><span class="topic-icon">${t.icon}</span>${t.name}</span>
-      <span class="count">${count}</span>
-    </button>`;
+// ─── AUTH ───
+function authTab(tab) {
+  document.getElementById('auth-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('auth-register').style.display = tab === 'register' ? 'block' : 'none';
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (tab==='login'&&i===0)||(tab==='register'&&i===1)));
+}
+
+function showAuthAlert(msg, type='error') {
+  const el = document.getElementById('auth-alert');
+  el.textContent = msg; el.className = `alert ${type} show`;
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+function doLogin() {
+  const email = v('l-email'), pass = v('l-pass');
+  if (!email || !pass) return showAuthAlert('Please fill all fields.');
+  const users = JSON.parse(localStorage.getItem('sripa_users') || '{}');
+  if (!users[email]) return showAuthAlert('Account not found. Please register.');
+  if (users[email].password !== btoa(pass)) return showAuthAlert('Incorrect password.');
+  currentUser = users[email];
+  localStorage.setItem('sripa_user', JSON.stringify(currentUser));
+  enterApp();
+}
+
+function sendOTP() {
+  const gemail = v('r-gemail');
+  if (!gemail || !gemail.includes('@gmail.com')) return showAuthAlert('Enter valid guardian Gmail.');
+  otpSent = Math.floor(100000 + Math.random() * 900000).toString();
+  // In production send via EmailJS; for now show in alert
+  showAuthAlert(`OTP for demo: ${otpSent} (In production this will be emailed to guardian)`, 'info');
+}
+
+function doRegister() {
+  const name=v('r-name'), email=v('r-email'), pass=v('r-pass');
+  const gname=v('r-gname'), gemail=v('r-gemail'), otp=v('r-otp');
+  if (!name||!email||!pass||!gname||!gemail) return showAuthAlert('Please fill all fields.');
+  if (!email.includes('@gmail.com')) return showAuthAlert('Use a valid Gmail ID.');
+  if (pass.length < 6) return showAuthAlert('Password must be at least 6 characters.');
+  if (!otpSent) return showAuthAlert('Please send OTP first to verify guardian Gmail.');
+  if (otp !== otpSent) return showAuthAlert('Invalid OTP. Please try again.');
+  const users = JSON.parse(localStorage.getItem('sripa_users') || '{}');
+  if (users[email]) return showAuthAlert('Account already exists. Please login.');
+  const user = { name, email, password: btoa(pass), gname, gemail, createdAt: Date.now() };
+  users[email] = user;
+  localStorage.setItem('sripa_users', JSON.stringify(users));
+  currentUser = user;
+  localStorage.setItem('sripa_user', JSON.stringify(currentUser));
+  showAuthAlert('Account created! Welcome 🎉', 'success');
+  setTimeout(enterApp, 1000);
+}
+
+function enterApp() {
+  document.getElementById('screen-auth').classList.remove('active');
+  document.getElementById('screen-app').classList.add('active');
+  document.getElementById('topbar-name').textContent = currentUser.name.split(' ')[0];
+  document.getElementById('avatar-init').textContent = currentUser.name[0].toUpperCase();
+  document.getElementById('welcome-name').textContent = `${currentUser.name} · ${currentUser.email}`;
+  setGreeting();
+  refreshHome();
+  renderExamList();
+  renderRoutineList();
+  renderTimetableView();
+  renderReasonsLog();
+  renderScoreHistory();
+  requestNotifPerms();
+}
+
+// ─── LOGOUT ───
+function showLogout() { openModal('logout-modal'); }
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem('sripa_user');
+  closeModal('logout-modal');
+  document.getElementById('screen-app').classList.remove('active');
+  document.getElementById('screen-auth').classList.add('active');
+}
+
+// ─── NAV ───
+function switchTab(tab, btn) {
+  ['home','exams','routine','reports'].forEach(t => {
+    document.getElementById(`tab-${t}`).style.display = t===tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (tab==='reports') { renderReasonsLog(); renderScoreHistory(); }
+  if (tab==='exams') renderExamList();
+  if (tab==='routine') { renderRoutineList(); renderTimetableView(); }
+}
+
+// ─── MODALS ───
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ─── EXAM ───
+function openExamModal() {
+  const now = new Date();
+  const local = new Date(now - now.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  document.getElementById('ex-datetime').value = local;
+  openModal('exam-modal');
+}
+
+function saveExam() {
+  const score = parseInt(v('ex-score'));
+  if (isNaN(score)||score<0||score>160) return alert('Enter valid score (0-160)');
+  const exam = {
+    id: Date.now(),
+    score,
+    name: v('ex-name') || 'Practice Test',
+    datetime: v('ex-datetime') || new Date().toISOString(),
+    stream: v('ex-stream') || 'MPC',
+    notes: v('ex-notes') || '',
+    date: new Date().toDateString()
+  };
+  const exams = getExams();
+  if (exams.length >= 300) { alert('300 exam limit reached! Delete older records.'); return; }
+  exams.unshift(exam);
+  saveExams(exams);
+  closeModal('exam-modal');
+  refreshHome();
+  renderExamList();
+  renderScoreHistory();
+  // Auto-predict rank
+  const rank = calcRank(score, exam.stream);
+  document.getElementById('rank-display').textContent = formatRank(rank.mid);
+  document.getElementById('rank-range').textContent = `Estimated range: ${formatRank(rank.low)} – ${formatRank(rank.high)}`;
+}
+
+function markAbsent() {
+  const today = new Date().toDateString();
+  const absents = JSON.parse(localStorage.getItem(`sripa_absents_${currentUser.email}`) || '[]');
+  if (absents.includes(today)) return alert('Already marked absent for today.');
+  absents.push(today);
+  localStorage.setItem(`sripa_absents_${currentUser.email}`, JSON.stringify(absents));
+  refreshHome();
+  alert('Marked as absent for today.');
+}
+
+function getExams() { return JSON.parse(localStorage.getItem(`sripa_exams_${currentUser.email}`) || '[]'); }
+function saveExams(e) { localStorage.setItem(`sripa_exams_${currentUser.email}`, JSON.stringify(e)); }
+
+function renderExamList() {
+  const exams = getExams();
+  const cnt = document.getElementById('exam-count-badge');
+  if (cnt) cnt.textContent = exams.length;
+  const container = document.getElementById('exam-list-container');
+  if (!container) return;
+  if (!exams.length) { container.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px">No exams recorded yet.</div>'; return; }
+  container.innerHTML = exams.map(e => {
+    const pct = Math.round((e.score/160)*100);
+    const col = pct>=70?'var(--accent3)':pct>=50?'var(--warn)':'var(--danger)';
+    return `<div class="exam-item">
+      <div class="exam-score" style="color:${col}">${e.score}</div>
+      <div class="exam-meta">
+        <div class="exam-subj">${e.name} <span class="badge badge-accent">${e.stream}</span></div>
+        <div class="exam-date">${new Date(e.datetime).toLocaleString()} · ${pct}%</div>
+        ${e.notes ? `<div style="font-size:.75rem;color:var(--muted);margin-top:2px">${e.notes}</div>` : ''}
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="deleteExam(${e.id})" style="color:var(--danger);border-color:var(--danger)">🗑</button>
+    </div>`;
   }).join('');
 }
 
-function setTopic(id) {
-  currentTopic = id;
-  renderTopics();
-  renderPdfs();
+function deleteExam(id) {
+  if (!confirm('Delete this exam result?')) return;
+  saveExams(getExams().filter(e => e.id !== id));
+  renderExamList(); refreshHome(); renderScoreHistory();
 }
 
-// ═══════════════════════════════
-// PDF GRID
-// ═══════════════════════════════
-function getFilteredPdfs() {
-  let list = [...pdfs];
-  if (currentTopic !== 'all') list = list.filter(p=>p.topic===currentTopic);
-  if (searchQuery) {
-    const q = searchQuery.toLowerCase();
-    list = list.filter(p=>
-      p.title.toLowerCase().includes(q)||
-      p.author.toLowerCase().includes(q)||
-      p.topic.toLowerCase().includes(q)||
-      p.desc.toLowerCase().includes(q)
-    );
-  }
-  switch(currentSort) {
-    case 'rating': list.sort((a,b)=>b.rating-a.rating); break;
-    case 'newest': list.sort((a,b)=>b.year-a.year); break;
-    case 'downloads': list.sort((a,b)=>b.downloads-a.downloads); break;
-    case 'pages': list.sort((a,b)=>a.pages-b.pages); break;
-  }
-  return list;
-}
-
-function ratingClass(r) {
-  if(r>=9) return 'rating-high';
-  if(r>=7.5) return 'rating-med';
-  return 'rating-low';
-}
-function ratingEmoji(r) {
-  if(r>=9) return '★';
-  if(r>=7.5) return '◆';
-  return '▲';
-}
-
-function renderPdfs() {
-  const list = getFilteredPdfs();
-  const grid = document.getElementById('pdfGrid');
-  const empty = document.getElementById('emptyState');
-  document.getElementById('resultCount').textContent = list.length;
-
-  if(!list.length){grid.innerHTML='';empty.style.display='block';return;}
-  empty.style.display='none';
-
-  grid.innerHTML = list.map(p=>`
-    <div class="pdf-card" onclick="openViewer(${p.id})">
-      <div class="card-top">
-        <div class="card-icon">📄</div>
-        <div class="card-meta">
-          <div class="rating-badge ${ratingClass(p.rating)}">${ratingEmoji(p.rating)} ${p.rating}</div>
-          <div class="card-pages">${p.pages} pages · ${p.year}</div>
-        </div>
-      </div>
-      <div class="card-title">${p.title}</div>
-      <div class="card-summary">${p.desc.substring(0,120)}…</div>
-      <div class="card-footer">
-        <span class="card-topic">${p.topic}</span>
-        <span class="card-downloads">⬇ ${(p.downloads/1000).toFixed(1)}k</span>
-      </div>
-      <button class="open-btn">📖 Read Now — Free</button>
-    </div>
-  `).join('');
-}
-
-function handleSearch() {
-  searchQuery = document.getElementById('searchInput').value;
-  renderPdfs();
-}
-
-function handleSort(val) {
-  currentSort = val;
-  renderPdfs();
-}
-
-function updateStats() {
-  document.getElementById('totalCount').textContent = pdfs.length;
-  document.getElementById('topicCount').textContent = TOPICS.length - 1;
-}
-
-// ═══════════════════════════════
-// UPLOAD MODAL
-// ═══════════════════════════════
-function openUpload() {
-  document.getElementById('uploadModal').classList.add('open');
-  document.getElementById('aiPanel').classList.remove('visible');
-  document.getElementById('uploadTitle').value='';
-  document.getElementById('uploadAuthor').value='';
-  document.getElementById('uploadTopic').value='';
-  document.getElementById('uploadYear').value='';
-  document.getElementById('uploadDesc').value='';
-  selectedFile = null;
-  const dz = document.getElementById('dropZone');
-  dz.innerHTML=`<div class="drop-icon">📄</div><div class="drop-text"><strong>Click to choose</strong> or drag & drop your PDF here</div><div class="drop-text" style="font-size:.75rem;margin-top:.3rem;">Max 50MB · PDF only</div><input type="file" id="fileInput" accept=".pdf" style="display:none" onchange="handleFile(this)"/>`;
-}
-function closeUpload(){document.getElementById('uploadModal').classList.remove('open');}
-
-function setupDragDrop(){
-  const dz = document.getElementById('dropZone');
-  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});
-  dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
-  dz.addEventListener('drop',e=>{
-    e.preventDefault();dz.classList.remove('dragover');
-    const f=e.dataTransfer.files[0];
-    if(f&&f.type==='application/pdf') setFile(f);
-    else showToast('Please drop a PDF file','error');
-  });
-}
-
-function handleFile(input){if(input.files[0]) setFile(input.files[0]);}
-function setFile(f){
-  selectedFile=f;
-  const dz=document.getElementById('dropZone');
-  dz.innerHTML=`<div class="drop-icon">✅</div><div class="drop-text"><strong>${f.name}</strong></div><div class="drop-text" style="font-size:.75rem;margin-top:.3rem;">${(f.size/1024/1024).toFixed(2)} MB</div>`;
-  if(!document.getElementById('uploadTitle').value)
-    document.getElementById('uploadTitle').value=f.name.replace('.pdf','');
-}
-
-// ═══════════════════════════════
-// AI ANALYSIS (Simulated)
-// ═══════════════════════════════
-async function runAIAnalysis(){
-  const title = document.getElementById('uploadTitle').value.trim();
-  const topic = document.getElementById('uploadTopic').value;
-  const desc = document.getElementById('uploadDesc').value.trim();
-
-  if(!title){showToast('Please enter a title','error');return;}
-  if(!topic){showToast('Please select a topic','error');return;}
-
-  const btn = document.getElementById('analyzeBtn');
-  btn.innerHTML = '<span class="loading-spinner"></span> Analyzing…';
-  btn.disabled = true;
-
-  // Simulate AI analysis
-  await sleep(800);
-  const panel = document.getElementById('aiPanel');
-  const result = document.getElementById('aiResult');
-  panel.classList.add('visible');
-  result.innerHTML = `<span class="ai-dot" style="display:inline-block;margin-right:6px;"></span> Reading document structure…`;
-
-  await sleep(900);
-  result.innerHTML += `<br>✓ Extracting topics and keywords…`;
-  await sleep(700);
-  result.innerHTML += `<br>✓ Evaluating content quality and relevance…`;
-  await sleep(800);
-
-  // Generate score
-  const score = (7 + Math.random()*2.5).toFixed(1);
-  const accepted = parseFloat(score) >= 7.0;
-  const sc = parseFloat(score);
-  const scoreClass = sc>=9?'score-high':sc>=7.5?'score-med':'score-low';
-  const rClass = sc>=9?'rating-high':sc>=7.5?'rating-med':'rating-low';
-
-  const verdicts = accepted ? [
-    'High quality document with strong relevance to the selected topic. Clear structure and well-cited content.',
-    'Good educational resource. Well-organized with accurate information appropriate for the topic.',
-    'Solid contribution to the library. Content is accurate, clearly written, and topically relevant.'
-  ] : [
-    'Content does not sufficiently match the selected topic. Please re-categorize or improve the document.',
-    'Quality score below threshold. The document lacks structure or sufficient topical relevance.',
+// ─── RANK PREDICTION (AP EAPCET Historical Data Formula) ───
+// Based on official AP EAPCET cutoffs 2019-2024:
+// Score 150-160 → Rank ~1-200
+// Score 140-149 → Rank ~200-800
+// Score 130-139 → Rank ~800-3000
+// Score 120-129 → Rank ~3000-8000
+// Score 110-119 → Rank ~8000-18000
+// Score 100-109 → Rank ~18000-35000
+// Score 90-99  → Rank ~35000-60000
+// Score 80-89  → Rank ~60000-90000
+// Score 70-79  → Rank ~90000-130000
+// Score 60-69  → Rank ~130000-180000
+// Score 50-59  → Rank ~180000-230000
+// Score 40-49  → Rank ~230000-280000
+// Score <40    → Rank ~280000+
+function calcRank(score, stream) {
+  const bipcMult = stream === 'BiPC' ? 0.6 : 1; // BiPC has fewer candidates in MPC-equivalent
+  const bands = [
+    {min:155,max:160,lo:1,hi:100},
+    {min:150,max:154,lo:100,hi:300},
+    {min:145,max:149,lo:300,hi:700},
+    {min:140,max:144,lo:700,hi:1500},
+    {min:135,max:139,lo:1500,hi:3500},
+    {min:130,max:134,lo:3500,hi:6000},
+    {min:125,max:129,lo:6000,hi:10000},
+    {min:120,max:124,lo:10000,hi:15000},
+    {min:115,max:119,lo:15000,hi:22000},
+    {min:110,max:114,lo:22000,hi:30000},
+    {min:105,max:109,lo:30000,hi:42000},
+    {min:100,max:104,lo:42000,hi:55000},
+    {min:95,max:99,lo:55000,hi:70000},
+    {min:90,max:94,lo:70000,hi:85000},
+    {min:85,max:89,lo:85000,hi:100000},
+    {min:80,max:84,lo:100000,hi:115000},
+    {min:75,max:79,lo:115000,hi:135000},
+    {min:70,max:74,lo:135000,hi:155000},
+    {min:65,max:69,lo:155000,hi:175000},
+    {min:60,max:64,lo:175000,hi:195000},
+    {min:50,max:59,lo:195000,hi:220000},
+    {min:40,max:49,lo:220000,hi:255000},
+    {min:0,max:39,lo:255000,hi:300000},
   ];
-  const verdict = verdicts[Math.floor(Math.random()*verdicts.length)];
-  const fill = Math.round(sc*10);
+  for (const b of bands) {
+    if (score >= b.min && score <= b.max) {
+      const range = b.max - b.min || 1;
+      const pos = (b.max - score) / range;
+      const mid = Math.round((b.lo + (b.hi-b.lo)*pos) * bipcMult);
+      return { low: Math.round(b.lo*bipcMult), mid, high: Math.round(b.hi*bipcMult) };
+    }
+  }
+  return { low: 290000, mid: 295000, high: 300000 };
+}
 
-  result.innerHTML=`
-    <p><strong>Analysis complete.</strong> ${verdict}</p>
-    <div class="ai-score">
-      <div class="score-circle ${scoreClass}">${score}</div>
-      <div class="score-info">
-        <div class="score-label">${accepted?'✅ Accepted to Library':'❌ Did Not Meet Threshold'}</div>
-        <div class="score-verdict">${accepted?'Your PDF has been added successfully.':'Score below 7.0. Please review and resubmit.'}</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:0%;background:${sc>=9?'var(--accent3)':sc>=7.5?'var(--accent)':'var(--accent2)'}" id="progressFill"></div></div>
-      </div>
-    </div>`;
+function formatRank(n) { return n.toLocaleString('en-IN'); }
 
-  setTimeout(()=>{
-    const pf=document.getElementById('progressFill');
-    if(pf)pf.style.width=fill+'%';
-  },100);
+function predictRank() {
+  const score = parseInt(document.getElementById('pred-score').value);
+  const stream = document.getElementById('pred-stream').value;
+  if (isNaN(score)||score<0||score>160) return alert('Enter valid score 0–160');
+  const rank = calcRank(score, stream);
+  document.getElementById('pred-rank-num').textContent = formatRank(rank.mid);
+  document.getElementById('pred-rank-range').textContent = `Range: ${formatRank(rank.low)} – ${formatRank(rank.high)}`;
+  const hint = getCollegeHint(rank.mid, stream);
+  document.getElementById('pred-college-hint').textContent = hint;
+  document.getElementById('pred-result').style.display = 'block';
+}
 
-  btn.innerHTML='🤖 Analyze with AI & Submit';
-  btn.disabled=false;
-
-  if(accepted){
-    // Add to library
-    const newPdf = {
-      id: Date.now(),
-      title,
-      author: document.getElementById('uploadAuthor').value||'Unknown Author',
-      topic,
-      year: parseInt(document.getElementById('uploadYear').value)||new Date().getFullYear(),
-      pages: Math.floor(Math.random()*300+50),
-      rating: parseFloat(score),
-      downloads: 0,
-      desc: desc||`A ${topic} document: ${title}.`,
-      analysis: verdict,
-      content: `<h2>${title}</h2><p>This document has been successfully analyzed and added to the PDFVault library.</p><p>${desc||'No description provided.'}</p><p><em>This is a user-contributed document. Content is displayed as submitted.</em></p>`
-    };
-    pdfs.unshift(newPdf);
-    renderTopics();
-    renderPdfs();
-    updateStats();
-    showToast('✅ PDF added to library!','success');
-    setTimeout(closeUpload,2200);
+function getCollegeHint(rank, stream) {
+  if (stream==='MPC') {
+    if (rank<=500) return '🏆 JNTU Kakinada CSE / NIT Warangal possible!';
+    if (rank<=3000) return '🎓 JNTU Hyderabad, Andhra University top branches';
+    if (rank<=15000) return '🎓 Good govt. colleges — CSE/ECE branches possible';
+    if (rank<=50000) return '🏫 State govt. colleges — IT/EEE branches';
+    if (rank<=120000) return '🏫 Private colleges with scholarships';
+    return '📚 Keep practicing! Aim for 100+ score.';
   } else {
-    showToast('PDF did not pass AI review','error');
+    if (rank<=500) return '🏆 SVMC Tirupati / Govt. Medical Colleges possible';
+    if (rank<=5000) return '🎓 Good govt. medical & pharma colleges';
+    if (rank<=20000) return '🏫 Private medical / pharma / biotech colleges';
+    return '📚 Keep practicing! Aim for 100+ score.';
   }
 }
 
-// ═══════════════════════════════
-// PDF VIEWER
-// ═══════════════════════════════
-function openViewer(id){
-  const p = pdfs.find(x=>x.id===id);
-  if(!p)return;
-  currentPdf=p;
-  p.downloads++;
+// ─── ROUTINE ───
+function openRoutineModal() { openModal('routine-modal'); }
 
-  document.getElementById('viewerTitle').textContent=p.title;
-  const rClass=p.rating>=9?'rating-high':p.rating>=7.5?'rating-med':'rating-low';
-  document.getElementById('viewerRating').className=`rating-badge ${rClass}`;
-  document.getElementById('viewerRating').textContent=`★ ${p.rating}`;
-  document.getElementById('viewerDesc').textContent=p.desc;
-  document.getElementById('viewerTopic').textContent=p.topic;
-  document.getElementById('viewerAuthor').textContent=p.author+` (${p.year})`;
-  document.getElementById('viewerAnalysis').textContent=p.analysis||'AI analysis not available.';
-  
-  const sc=p.rating;
-  const scClass=sc>=9?'score-high':sc>=7.5?'score-med':'score-low';
-  document.getElementById('viewerScore').innerHTML=`<div class="ai-score"><div class="score-circle ${scClass}">${p.rating}</div><div class="score-info"><div class="score-label">${sc>=9?'Excellent':sc>=7.5?'Good':'Acceptable'}</div><div class="score-verdict">AI Quality Rating</div></div></div>`;
-
-  document.getElementById('pdfPreview').innerHTML=`
-    <div class="pdf-page-sim">${p.content||'<p>No preview available.</p>'}</div>
-    <div style="font-family:var(--font-mono,monospace);font-size:.75rem;color:var(--muted);text-align:center;padding:1rem;">
-      Page 1 of ${p.pages} — Free to read & download
-    </div>`;
-
-  document.getElementById('viewerModal').classList.add('open');
-  renderPdfs();
+function saveRoutine() {
+  const time=v('rt-time'), act=v('rt-act'), dur=v('rt-dur');
+  if (!time||!act) return alert('Time and Activity required.');
+  const routines = getRoutines();
+  routines.push({ id:Date.now(), time, act, dur:dur||'', date:new Date().toDateString() });
+  routines.sort((a,b)=>a.time.localeCompare(b.time));
+  saveRoutines(routines);
+  closeModal('routine-modal');
+  renderRoutineList();
 }
 
-function closeViewer(){document.getElementById('viewerModal').classList.remove('open');}
+function getRoutines() { return JSON.parse(localStorage.getItem(`sripa_routines_${currentUser.email}`) || '[]'); }
+function saveRoutines(r) { localStorage.setItem(`sripa_routines_${currentUser.email}`, JSON.stringify(r)); }
 
-function downloadPdf(){
-  if(!currentPdf)return;
-  showToast('⬇ Download started!','success');
-  // In real app: trigger actual PDF download
-  const a=document.createElement('a');
-  a.href='#';
-  a.download=currentPdf.title+'.pdf';
-}
-
-// ═══════════════════════════════
-// UTILITIES
-// ═══════════════════════════════
-function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-
-function showToast(msg,type='success'){
-  const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.className=`toast toast-${type} show`;
-  setTimeout(()=>t.classList.remove('show'),3000);
-}
-
-function showStats(){
-  showToast(`📊 ${pdfs.length} PDFs · ${TOPICS.length-1} topics · All free!`,'success');
-}
-
-// ═══════════════════════════════
-// CLOSE ON OVERLAY CLICK
-// ═══════════════════════════════
-document.getElementById('uploadModal').addEventListener('click',function(e){
-  if(e.target===this)closeUpload();
-});
-
-init();
-
-// ═══════════════════════════════
-// VISUALIZATIONS
-// ═══════════════════════════════
-let vizRendered = false;
-
-function toggleViz() {
-  const grid = document.getElementById('vizGrid');
-  const btn = document.getElementById('vizToggleBtn');
-  const visible = grid.style.display !== 'none';
-  if (visible) {
-    grid.style.display = 'none';
-    btn.innerHTML = '<span>▶ Show Visualizations</span>';
-  } else {
-    grid.style.display = 'grid';
-    btn.innerHTML = '<span>▼ Hide Visualizations</span>';
-    if (!vizRendered) { renderVisualizations(); vizRendered = true; }
-  }
-}
-
-function renderVisualizations() {
-  renderBarChart();
-  renderDonut();
-  renderSparkList();
-}
-
-function renderBarChart() {
-  const topicCounts = {};
-  pdfs.forEach(p => { topicCounts[p.topic] = (topicCounts[p.topic]||0)+1; });
-  const sorted = Object.entries(topicCounts).sort((a,b)=>b[1]-a[1]).slice(0,7);
-  const max = sorted[0][1];
-  const el = document.getElementById('barChart');
-  el.innerHTML = sorted.map(([t,c]) => `
-    <div class="bar-row">
-      <div class="bar-label">${t.length>12?t.substring(0,12)+'…':t}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:0%" data-target="${Math.round(c/max*100)}"></div></div>
-      <div class="bar-count">${c}</div>
+function renderRoutineList() {
+  const all = getRoutines();
+  const today = new Date().toDateString();
+  const container = document.getElementById('routine-log-list');
+  if (!container) return;
+  const todayR = all.filter(r=>r.date===today);
+  if (!todayR.length) { container.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px">No activities logged today.</div>'; return; }
+  container.innerHTML = todayR.map(r=>`
+    <div class="routine-slot">
+      <div class="slot-time">${r.time}</div>
+      <div class="slot-act">${r.act}${r.dur ? ` <span style="color:var(--muted);font-size:.75rem">(${r.dur} min)</span>` : ''}</div>
+      <button onclick="deleteRoutine(${r.id})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:.9rem">🗑</button>
     </div>`).join('');
-  setTimeout(() => {
-    el.querySelectorAll('.bar-fill').forEach(b => b.style.width = b.dataset.target + '%');
-  }, 100);
 }
 
-function renderDonut() {
-  const canvas = document.getElementById('donutChart');
-  const ctx = canvas.getContext('2d');
-  const high = pdfs.filter(p=>p.rating>=9).length;
-  const med = pdfs.filter(p=>p.rating>=7.5&&p.rating<9).length;
-  const low = pdfs.filter(p=>p.rating<7.5).length;
-  const data = [high, med, low];
-  const colors = ['#5be0b3','#f0b429','#e05b5b'];
-  const labels = ['9+ Excellent','7.5–9 Good','<7.5 Fair'];
-  const total = data.reduce((a,b)=>a+b,0);
-  const cx=100,cy=100,r=75,ir=48;
-  let angle = -Math.PI/2;
-  data.forEach((v,i) => {
-    const slice = (v/total)*Math.PI*2;
-    ctx.beginPath();
-    ctx.moveTo(cx,cy);
-    ctx.arc(cx,cy,r,angle,angle+slice);
-    ctx.closePath();
-    ctx.fillStyle = colors[i];
-    ctx.fill();
-    angle += slice;
+function deleteRoutine(id) {
+  saveRoutines(getRoutines().filter(r=>r.id!==id));
+  renderRoutineList();
+}
+
+// ─── TIMETABLE ───
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+function openTimetableModal() {
+  const tt = getTimetable();
+  document.getElementById('tt-inputs').innerHTML = DAYS.map(d=>`
+    <div class="tt-row">
+      <div class="tt-day">${d}</div>
+      <input class="tt-subject" type="text" id="tt-${d}" placeholder="e.g. Physics Mock + Maths Revision" value="${tt[d]||''}">
+    </div>`).join('');
+  openModal('tt-modal');
+}
+
+function saveTimetable() {
+  const tt = {};
+  DAYS.forEach(d => { tt[d] = document.getElementById(`tt-${d}`)?.value || ''; });
+  localStorage.setItem(`sripa_tt_${currentUser.email}`, JSON.stringify(tt));
+  closeModal('tt-modal');
+  renderTimetableView();
+}
+
+function getTimetable() { return JSON.parse(localStorage.getItem(`sripa_tt_${currentUser.email}`) || '{}'); }
+
+function renderTimetableView() {
+  const tt = getTimetable();
+  const el = document.getElementById('tt-list');
+  if (!el) return;
+  const hasAny = DAYS.some(d=>tt[d]);
+  if (!hasAny) { el.innerHTML='<div style="color:var(--muted);font-size:.85rem">No timetable set. Click Edit Timetable.</div>'; return; }
+  el.innerHTML = DAYS.map(d=>`
+    <div class="tt-row">
+      <div class="tt-day">${d}</div>
+      <div style="flex:1;font-size:.85rem">${tt[d]||'<span style="color:var(--muted)">—</span>'}</div>
+    </div>`).join('');
+}
+
+// ─── REASONS ───
+function saveReason() {
+  const text = document.getElementById('reason-text').value.trim();
+  if (!text) return alert('Please enter a reason.');
+  const reasons = JSON.parse(localStorage.getItem(`sripa_reasons_${currentUser.email}`) || '[]');
+  reasons.unshift({ date:new Date().toDateString(), text, ts:Date.now() });
+  localStorage.setItem(`sripa_reasons_${currentUser.email}`, JSON.stringify(reasons));
+  closeModal('reason-modal');
+  renderReasonsLog();
+  alert('Reason saved ✅');
+}
+
+function renderReasonsLog() {
+  const reasons = JSON.parse(localStorage.getItem(`sripa_reasons_${currentUser.email}`) || '[]');
+  const el = document.getElementById('reasons-list');
+  if (!el) return;
+  if (!reasons.length) { el.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px">No missed day reasons.</div>'; return; }
+  el.innerHTML = reasons.map(r=>`
+    <div style="padding:10px 0;border-bottom:1px solid rgba(30,58,95,.4)">
+      <div style="font-size:.75rem;color:var(--warn);margin-bottom:4px">${r.date}</div>
+      <div style="font-size:.88rem">${r.text}</div>
+    </div>`).join('');
+}
+
+// ─── SCORE HISTORY ───
+function renderScoreHistory() {
+  const exams = getExams();
+  const el = document.getElementById('score-history-list');
+  if (!el) return;
+  if (!exams.length) { el.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px">No history yet.</div>'; return; }
+  const last20 = exams.slice(0,20);
+  el.innerHTML = last20.map(e=>{
+    const pct = Math.round((e.score/160)*100);
+    const col = pct>=70?'var(--accent3)':pct>=50?'var(--warn)':'var(--danger)';
+    const rank = calcRank(e.score, e.stream||'MPC');
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(30,58,95,.3)">
+      <div style="font-family:var(--font-head);font-size:1.2rem;font-weight:700;color:${col};min-width:44px">${e.score}</div>
+      <div style="flex:1">
+        <div style="font-size:.85rem">${e.name}</div>
+        <div style="font-size:.72rem;color:var(--muted)">${new Date(e.datetime).toLocaleDateString()} · Rank ~${formatRank(rank.mid)}</div>
+      </div>
+      <div style="text-align:right;font-size:.75rem;color:${col}">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── HOME REFRESH ───
+function refreshHome() {
+  const today = new Date().toDateString();
+  const exams = getExams().filter(e => new Date(e.datetime).toDateString() === today);
+  document.getElementById('today-exams').textContent = exams.length;
+  const pct = Math.min(100, (exams.length/2)*100);
+  document.getElementById('today-prog').style.width = pct + '%';
+  const avg = exams.length ? Math.round(exams.reduce((s,e)=>s+e.score,0)/exams.length) : null;
+  document.getElementById('today-avg').textContent = avg !== null ? avg : '—';
+
+  const allExams = getExams();
+  document.getElementById('total-exams').textContent = allExams.length;
+  document.getElementById('best-score').textContent = allExams.length ? Math.max(...allExams.map(e=>e.score)) : 0;
+  const absents = JSON.parse(localStorage.getItem(`sripa_absents_${currentUser.email}`) || '[]');
+  document.getElementById('absent-count').textContent = absents.length;
+  document.getElementById('streak-count').textContent = calcStreak();
+
+  // Rank from latest exam
+  if (allExams.length) {
+    const latest = allExams[0];
+    const rank = calcRank(latest.score, latest.stream||'MPC');
+    document.getElementById('rank-display').textContent = formatRank(rank.mid);
+    document.getElementById('rank-range').textContent = `Based on last test (${latest.score}/160) · Range: ${formatRank(rank.low)}–${formatRank(rank.high)}`;
+  }
+}
+
+function calcStreak() {
+  const exams = getExams();
+  if (!exams.length) return 0;
+  const dates = [...new Set(exams.map(e=>new Date(e.datetime).toDateString()))];
+  let streak = 0, d = new Date();
+  while (true) {
+    if (dates.includes(d.toDateString())) { streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+// ─── NOTIFICATIONS ───
+function requestNotifPerms() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function scheduleDailyChecks() {
+  checkReminders();
+  setInterval(checkReminders, 60000); // check every minute
+}
+
+function checkReminders() {
+  const now = new Date();
+  const hh = now.getHours(), mm = now.getMinutes();
+  const key9am = `sripa_notif_9am_${now.toDateString()}`;
+  const key9pm = `sripa_notif_9pm_${now.toDateString()}`;
+  const key10pm = `sripa_notif_10pm_${now.toDateString()}`;
+
+  if (hh===9 && mm===0 && !localStorage.getItem(key9am) && currentUser) {
+    localStorage.setItem(key9am,'1');
+    pushNotif('⏰ Sripa EAPCET Reminder', 'Good morning! Complete at least 2 practice exams (3 hours each) today. You can do it! 💪');
+  }
+  if (hh===21 && mm===0 && !localStorage.getItem(key9pm) && currentUser) {
+    localStorage.setItem(key9pm,'1');
+    const today = new Date().toDateString();
+    const exams = getExams().filter(e=>new Date(e.datetime).toDateString()===today);
+    if (exams.length < 2) {
+      pushNotif('⚠️ Sripa EAPCET Alert', `You've only done ${exams.length} exam(s) today. Target is 2. Please log your reason.`);
+      setTimeout(() => openModal('reason-modal'), 2000);
+    }
+  }
+  if (hh===22 && mm===0 && !localStorage.getItem(key10pm) && currentUser) {
+    localStorage.setItem(key10pm,'1');
+    sendGuardianReport(true);
+  }
+}
+
+function pushNotif(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body, icon: '📚' });
+  }
+}
+
+// ─── EMAIL REPORT ───
+function sendGuardianReport(auto=false) {
+  const mailAlert = document.getElementById('mail-alert');
+  if (!currentUser) return;
+  const today = new Date().toDateString();
+  const exams = getExams().filter(e=>new Date(e.datetime).toDateString()===today);
+  const routines = getRoutines().filter(r=>r.date===today);
+  const reasons = JSON.parse(localStorage.getItem(`sripa_reasons_${currentUser.email}`) || '[]').filter(r=>r.date===today);
+
+  const examText = exams.length
+    ? exams.map(e=>`• ${e.name}: ${e.score}/160 (${Math.round(e.score/160*100)}%) at ${new Date(e.datetime).toLocaleTimeString()}`).join('\n')
+    : 'No exams written today.';
+
+  const routineText = routines.length
+    ? routines.map(r=>`• ${r.time} – ${r.act}${r.dur ? ` (${r.dur} min)`:''}`).join('\n')
+    : 'No routine logged.';
+
+  const reasonText = reasons.length ? reasons.map(r=>r.text).join('; ') : '';
+
+  let latestRank = '—';
+  const allExams = getExams();
+  if (allExams.length) {
+    const r = calcRank(allExams[0].score, allExams[0].stream||'MPC');
+    latestRank = `~${formatRank(r.mid)} (Range: ${formatRank(r.low)}–${formatRank(r.high)})`;
+  }
+
+  const message = `
+AP EAPCET Daily Report — ${today}
+Student: ${currentUser.name}
+Gmail: ${currentUser.email}
+
+📝 EXAMS TODAY (${exams.length}/2 target):
+${examText}
+
+📈 LATEST PREDICTED RANK: ${latestRank}
+
+📋 DAILY ROUTINE:
+${routineText}
+
+${reasonText ? `⚠️ MISSED EXAM REASON: ${reasonText}` : ''}
+
+Sent by Sripa AP EAPCET Monitoring App.
+`.trim();
+
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    to_email: currentUser.gemail,
+    to_name: currentUser.gname,
+    from_name: currentUser.name,
+    message: message,
+    subject: `📚 AP EAPCET Daily Report - ${currentUser.name} - ${today}`
+  }).then(() => {
+    if (!auto && mailAlert) {
+      mailAlert.textContent = `✅ Report sent to ${currentUser.gemail} successfully!`;
+      mailAlert.className = 'alert success show';
+      setTimeout(()=>mailAlert.classList.remove('show'),5000);
+    }
+  }).catch(err => {
+    if (!auto && mailAlert) {
+      mailAlert.textContent = `⚠️ Could not send email. Check EmailJS config. Error: ${err.text}`;
+      mailAlert.className = 'alert error show';
+      setTimeout(()=>mailAlert.classList.remove('show'),6000);
+    }
+    console.error('EmailJS error:', err);
   });
-  ctx.beginPath();
-  ctx.arc(cx,cy,ir,0,Math.PI*2);
-  ctx.fillStyle = '#141420';
-  ctx.fill();
-  ctx.fillStyle = '#e8e6f0';
-  ctx.font = 'bold 20px Syne,sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(total, cx, cy+4);
-  ctx.font = '11px DM Mono,monospace';
-  ctx.fillStyle = '#7a7890';
-  ctx.fillText('PDFs', cx, cy+18);
-  const legend = document.getElementById('donutLegend');
-  legend.innerHTML = data.map((v,i) => `
-    <div class="legend-item">
-      <div class="legend-dot" style="background:${colors[i]}"></div>
-      ${labels[i]}: ${v}
-    </div>`).join('');
 }
 
-function renderSparkList() {
-  const sorted = [...pdfs].sort((a,b)=>b.downloads-a.downloads).slice(0,5);
-  const max = sorted[0].downloads;
-  const el = document.getElementById('sparkList');
-  el.innerHTML = sorted.map((p,i) => `
-    <div class="spark-row">
-      <div class="spark-rank ${i===0?'r1':i===1?'r2':i===2?'r3':''}">#${i+1}</div>
-      <div class="spark-info">
-        <div class="spark-title">${p.title}</div>
-        <div class="spark-track"><div class="spark-fill" style="width:0%" data-target="${Math.round(p.downloads/max*100)}"></div></div>
-      </div>
-      <div class="spark-num">${(p.downloads/1000).toFixed(1)}k</div>
-    </div>`).join('');
-  setTimeout(() => {
-    el.querySelectorAll('.spark-fill').forEach(b => b.style.width = b.dataset.target + '%');
-  }, 200);
-}
+// ─── HELPERS ───
+function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
 
-// ═══════════════════════════════
-// EMBED
-// ═══════════════════════════════
-function loadEmbed() {
-  const c = document.getElementById('embedContainer');
-  c.innerHTML = `<iframe class="notebooklm-frame" src="https://notebooklm.google.com" title="Google NotebookLM" allow="clipboard-write" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"></iframe>`;
-  showToast('📓 NotebookLM loaded!', 'success');
+// ─── PWA SERVICE WORKER ───
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
 }
 </script>
 </body>
